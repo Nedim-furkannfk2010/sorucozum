@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çalışma Takip Sistemi</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+        }
+
+        .card h2 {
+            color: #1f2937;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+        }
+
+        .categories-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f3f4f6;
+            border-radius: 15px;
+        }
+
+        .category-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .category-input-group input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1em;
+        }
+
+        .category-input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-small {
+            padding: 8px 20px;
+            font-size: 0.95em;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        .btn-success:hover {
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-danger {
+            background: #ef4444;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        .categories-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .category-tag {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .category-tag span {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .remove-category {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group label {
+            color: #374151;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .input-group input, .input-group textarea {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .input-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
+
+        .input-group input:focus, .input-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .dynamic-inputs {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .export-section {
+            background: #f0fdf4;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #10b981;
+            margin-bottom: 20px;
+        }
+
+        .export-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .records-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            overflow-x: auto;
+            display: block;
+        }
+
+        .records-table table {
+            width: 100%;
+        }
+
+        .records-table th {
+            background: #f3f4f6;
+            padding: 15px;
+            text-align: left;
+            color: #374151;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+            white-space: nowrap;
+        }
+
+        .records-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #4b5563;
+        }
+
+        .records-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9ca3af;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-left: 5px solid #667eea;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-input-group, .export-buttons {
+                flex-direction: column;
+            }
+
+            .dynamic-inputs {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📚 Çalışma Takip Sistemi</h1>
+            <p>Kendi kategorilerini oluştur ve çalışmalarını takip et</p>
+        </div>
+
+        <div class="card">
+            <h2>🏷️ Kategorileri Yönet</h2>
+            <div class="categories-section">
+                <div class="category-input-group">
+                    <input type="text" id="newCategory" placeholder="Kategori adı (örn: Paragraf, Matematik 20d 5y, Soru)">
+                    <button class="btn btn-small" onclick="addCategory()">➕ Kategori Ekle</button>
+                </div>
+                <div class="categories-list" id="categoriesList"></div>
+            </div>
+        </div>
+
+        <div class="stats" id="statsContainer"></div>
+
+        <div class="card">
+            <h2>➕ Yeni Kayıt Ekle</h2>
+            <div class="input-grid">
+                <div class="input-group">
+                    <label>📅 Tarih</label>
+                    <input type="date" id="tarih">
+                </div>
+            </div>
+            <div class="dynamic-inputs" id="dynamicInputs"></div>
+            <button class="btn" onclick="addRecord()" style="margin-top: 20px;">💾 Kaydet</button>
+        </div>
+
+        <div class="card">
+            <h2>📊 Kayıtlarım</h2>
+            
+            <div class="export-section">
+                <h3 style="color: #059669; margin-bottom: 15px;">📥 Verileri İndir</h3>
+                <div class="export-buttons">
+                    <button class="btn btn-small btn-success" onclick="exportData('today')">📅 Bugünü İndir</button>
+                    <button class="btn btn-small btn-success" onclick="exportData('week')">📆 Bu Haftayı İndir</button>
+                    <button class="btn btn-small btn-success" onclick="exportData('month')">🗓️ Bu Ayı İndir</button>
+                    <button class="btn btn-small btn-success" onclick="exportData('all')">📚 Tümünü İndir</button>
+                </div>
+            </div>
+
+            <div id="recordsContainer"></div>
+        </div>
+    </div>
+
+    <script>
+        let categories = [];
+        let records = [];
+
+        window.onload = function() {
+            document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
+            loadData();
+        };
+
+        function loadData() {
+            const savedCategories = localStorage.getItem('categories');
+            const savedRecords = localStorage.getItem('studyRecords');
+            
+            if (savedCategories) {
+                categories = JSON.parse(savedCategories);
+            }
+            if (savedRecords) {
+                records = JSON.parse(savedRecords);
+            }
+            
+            updateDisplay();
+        }
+
+        function saveData() {
+            localStorage.setItem('categories', JSON.stringify(categories));
+            localStorage.setItem('studyRecords', JSON.stringify(records));
+        }
+
+        function addCategory() {
+            const input = document.getElementById('newCategory');
+            const categoryName = input.value.trim();
+            
+            if (!categoryName) {
+                alert('Lütfen bir kategori adı girin!');
+                return;
+            }
+
+            if (categories.includes(categoryName)) {
+                alert('Bu kategori zaten mevcut!');
+                return;
+            }
+
+            categories.push(categoryName);
+            input.value = '';
+            saveData();
+            updateDisplay();
+        }
+
+        function removeCategory(categoryName) {
+            if (confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu kategoriye ait tüm veriler kayıtlardan kaldırılacak.`)) {
+                categories = categories.filter(c => c !== categoryName);
+                
+                records = records.map(record => {
+                    delete record.data[categoryName];
+                    return record;
+                });
+                
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function addRecord() {
+            const tarih = document.getElementById('tarih').value;
+            
+            if (!tarih) {
+                alert('Lütfen tarih seçin!');
+                return;
+            }
+
+            if (categories.length === 0) {
+                alert('Lütfen önce en az bir kategori ekleyin!');
+                return;
+            }
+
+            const data = {};
+            let hasValue = false;
+
+            categories.forEach(category => {
+                const value = document.getElementById('input_' + category).value.trim();
+                data[category] = value;
+                if (value) hasValue = true;
+            });
+
+            if (!hasValue) {
+                alert('Lütfen en az bir değer girin!');
+                return;
+            }
+
+            records.push({
+                id: Date.now(),
+                tarih: tarih,
+                data: data
+            });
+
+            saveData();
+            updateDisplay();
+
+            categories.forEach(category => {
+                document.getElementById('input_' + category).value = '';
+            });
+            document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
+        }
+
+        function deleteRecord(id) {
+            if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
+                records = records.filter(r => r.id !== id);
+                saveData();
+                updateDisplay();
+            }
+        }
+
+        function exportData(period) {
+            const now = new Date();
+            let filteredRecords = [];
+
+            if (period === 'today') {
+                const today = now.toISOString().split('T')[0];
+                filteredRecords = records.filter(r => r.tarih === today);
+            } else if (period === 'week') {
+                const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                filteredRecords = records.filter(r => new Date(r.tarih) >= weekAgo);
+            } else if (period === 'month') {
+                const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                filteredRecords = records.filter(r => new Date(r.tarih) >= monthAgo);
+            } else {
+                filteredRecords = records;
+            }
+
+            if (filteredRecords.length === 0) {
+                alert('Bu dönemde kayıt bulunamadı!');
+                return;
+            }
+
+            // CSV formatında oluştur
+            let csv = 'Tarih,' + categories.join(',') + '\n';
+            
+            filteredRecords.sort((a, b) => new Date(a.tarih) - new Date(b.tarih)).forEach(record => {
+                const row = [record.tarih];
+                categories.forEach(cat => {
+                    row.push(record.data[cat] || '');
+                });
+                csv += row.join(',') + '\n';
+            });
+
+            // İndir
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            
+            const periodNames = {
+                'today': 'Bugün',
+                'week': 'Bu_Hafta',
+                'month': 'Bu_Ay',
+                'all': 'Tüm_Veriler'
+            };
+            
+            link.setAttribute('href', url);
+            link.setAttribute('download', `Çalışma_Takip_${periodNames[period]}_${now.toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        function updateDisplay() {
+            displayCategories();
+            displayDynamicInputs();
+            displayStats();
+            displayRecords();
+        }
+
+        function displayCategories() {
+            const container = document.getElementById('categoriesList');
+            
+            if (categories.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 20px;">Henüz kategori eklenmedi. Yukarıdaki alandan kategori ekleyin.</p>';
+                return;
+            }
+
+            container.innerHTML = categories.map(category => `
+                <div class="category-tag">
+                    <span>${category}</span>
+                    <button class="remove-category" onclick="removeCategory('${category.replace(/'/g, "\\'")}')">✕</button>
+                </div>
+            `).join('');
+        }
+
+        function displayDynamicInputs() {
+            const container = document.getElementById('dynamicInputs');
+            
+            if (categories.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 20px;">Kategori ekledikten sonra buraya giriş alanları gelecek.</p>';
+                return;
+            }
+
+            container.innerHTML = categories.map(category => `
+                <div class="input-group">
+                    <label>${category}</label>
+                    <textarea id="input_${category}" placeholder="20d 5y veya sadece 25 gibi yazabilirsiniz" rows="2"></textarea>
+                </div>
+            `).join('');
+        }
+
+        function displayStats() {
+            const container = document.getElementById('statsContainer');
+            
+            if (categories.length === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = categories.map(category => `
+                <div class="stat-card">
+                    <div class="stat-label">${category}</div>
+                    <div class="stat-value" style="font-size: 1.3em;">${records.length} kayıt</div>
+                </div>
+            `).join('');
+        }
+
+        function displayRecords() {
+            const container = document.getElementById('recordsContainer');
+            
+            if (records.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <p style="font-size: 3em;">📚</p>
+                        <h3 style="color: #9ca3af; margin-bottom: 10px;">Henüz kayıt yok</h3>
+                        <p>Yukarıdaki formu kullanarak ilk kaydını ekle!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sortedRecords = [...records].sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
+
+            let html = `
+                <div class="records-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                ${categories.map(cat => `<th>${cat}</th>`).join('')}
+                                <th>İşlem</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            sortedRecords.forEach(record => {
+                const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+
+                html += `
+                    <tr>
+                        <td><strong>${formattedDate}</strong></td>
+                        ${categories.map(cat => `<td>${record.data[cat] || '-'}</td>`).join('')}
+                        <td>
+                            <button class="delete-btn" onclick="deleteRecord(${record.id})">🗑️ Sil</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
