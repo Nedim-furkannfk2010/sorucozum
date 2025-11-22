@@ -138,6 +138,10 @@
             background: #ef4444;
         }
 
+        .btn-warning {
+            background: #f59e0b;
+        }
+
         .user-info {
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
@@ -315,6 +319,11 @@
             color: #065f46;
         }
 
+        .badge-admin {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
         .notification-badge {
             background: #ef4444;
             color: white;
@@ -340,6 +349,140 @@
 
         .status-badge.connected {
             background: rgba(34, 197, 94, 0.3);
+        }
+
+        /* Admin Panel Styles */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .admin-stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .admin-stat-card h3 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .admin-stat-card p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .users-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background: #f3f4f6;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .users-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .modal-header h3 {
+            color: #1f2937;
+            font-size: 1.5em;
+        }
+
+        .close-modal {
+            background: #ef4444;
+            color: white;
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .admin-panel-header {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        @media (max-width: 768px) {
+            .action-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -410,6 +553,52 @@
                 </div>
             </div>
 
+            <!-- Admin Panel -->
+            <div id="adminPanel" class="hidden">
+                <div class="admin-panel-header">
+                    <h2 style="margin: 0; font-size: 2em;">👑 Admin Paneli</h2>
+                    <p style="margin-top: 10px; opacity: 0.9;">Sistem yönetimi ve kullanıcı kontrolü</p>
+                </div>
+
+                <div class="admin-stats">
+                    <div class="admin-stat-card">
+                        <h3 id="totalUsersCount">0</h3>
+                        <p>Toplam Kullanıcı</p>
+                    </div>
+                    <div class="admin-stat-card" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                        <h3 id="totalStudentsCount">0</h3>
+                        <p>Öğrenci</p>
+                    </div>
+                    <div class="admin-stat-card" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">
+                        <h3 id="totalTeachersCount">0</h3>
+                        <p>Öğretmen</p>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">👥 Tüm Kullanıcılar</h2>
+                        <button class="btn btn-small btn-success" onclick="openAddUserModal()">➕ Kullanıcı Ekle</button>
+                    </div>
+                    <div class="users-table-container">
+                        <table class="users-table">
+                            <thead>
+                                <tr>
+                                    <th>Ad Soyad</th>
+                                    <th>E-posta</th>
+                                    <th>Tip</th>
+                                    <th>Kayıt Tarihi</th>
+                                    <th>İşlemler</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                                <!-- Kullanıcılar buraya gelecek -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <!-- Öğretmen Bildirimleri -->
             <div id="teacherNotifications" class="hidden"></div>
 
@@ -476,9 +665,39 @@
         </div>
     </div>
 
+    <!-- Kullanıcı Ekleme/Düzenleme Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">➕ Kullanıcı Ekle</h3>
+                <button class="close-modal" onclick="closeUserModal()">✕</button>
+            </div>
+            <div class="input-group">
+                <label>👤 Ad Soyad</label>
+                <input type="text" id="modalUserName" placeholder="Ad Soyad">
+            </div>
+            <div class="input-group">
+                <label>📧 E-posta</label>
+                <input type="email" id="modalUserEmail" placeholder="E-posta">
+            </div>
+            <div class="input-group">
+                <label>🔒 Şifre</label>
+                <input type="password" id="modalUserPassword" placeholder="Şifre (En az 6 karakter)">
+            </div>
+            <div class="input-group">
+                <label>👥 Hesap Türü</label>
+                <select id="modalUserType">
+                    <option value="student">🎓 Öğrenci</option>
+                    <option value="teacher">👨‍🏫 Öğretmen</option>
+                </select>
+            </div>
+            <button class="btn" onclick="saveUser()">💾 Kaydet</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getDatabase, ref, set, get, onValue, push, update } 
+        import { getDatabase, ref, set, get, onValue, push, update, remove } 
             from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
@@ -499,7 +718,13 @@
         let categories = [];
         let records = [];
         let allStudents = [];
+        let allUsers = {};
         let notifications = [];
+        let editingUserId = null;
+
+        // Admin bilgileri
+        const ADMIN_EMAIL = 'admin@gmail.com';
+        const ADMIN_PASSWORD = 'admin123';
 
         // Sayfa yüklendiğinde oturum kontrolü
         window.onload = function() {
@@ -545,26 +770,22 @@
             }
 
             try {
-                // E-posta kontrolü
                 const usersRef = ref(database, 'users');
                 const snapshot = await get(usersRef);
                 const users = snapshot.val() || {};
                 
-                // E-posta zaten kayıtlı mı?
                 const existingUser = Object.values(users).find(u => u.email === email);
                 if (existingUser) {
                     alert('Bu e-posta adresi zaten kayıtlı!');
                     return;
                 }
 
-                // Yeni kullanıcı ID'si oluştur
                 const userId = 'user_' + Date.now();
 
-                // Kullanıcıyı kaydet
                 await set(ref(database, `users/${userId}`), {
                     name: name,
                     email: email,
-                    password: password, // Gerçek projede hash'lenmiş olmalı
+                    password: password,
                     userType: userType,
                     createdAt: new Date().toISOString()
                 });
@@ -602,12 +823,24 @@
                 return;
             }
 
+            // Admin kontrolü
+            if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
+                currentUser = {
+                    uid: 'admin',
+                    name: 'Admin',
+                    email: ADMIN_EMAIL,
+                    userType: 'admin'
+                };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainScreen();
+                return;
+            }
+
             try {
                 const usersRef = ref(database, 'users');
                 const snapshot = await get(usersRef);
                 const users = snapshot.val() || {};
                 
-                // Kullanıcıyı bul
                 let foundUser = null;
                 let userId = null;
                 
@@ -644,24 +877,219 @@
             document.getElementById('authScreen').classList.add('hidden');
             document.getElementById('mainScreen').classList.remove('hidden');
             
-            const userType = currentUser.userType === 'teacher' ? '👨‍🏫 Öğretmen' : '🎓 Öğrenci';
-            document.getElementById('userDisplayName').innerHTML = 
-                `${currentUser.name} <span class="badge ${currentUser.userType === 'teacher' ? 'badge-teacher' : 'badge-student'}">${userType}</span>`;
-
-            if (currentUser.userType === 'teacher') {
-                showTeacherInterface();
+            if (currentUser.userType === 'admin') {
+                showAdminPanel();
             } else {
-                showStudentInterface();
+                const userType = currentUser.userType === 'teacher' ? '👨‍🏫 Öğretmen' : '🎓 Öğrenci';
+                document.getElementById('userDisplayName').innerHTML = 
+                    `${currentUser.name} <span class="badge ${currentUser.userType === 'teacher' ? 'badge-teacher' : 'badge-student'}">${userType}</span>`;
+
+                if (currentUser.userType === 'teacher') {
+                    showTeacherInterface();
+                } else {
+                    showStudentInterface();
+                }
             }
         }
 
+        // ========== ADMIN PANEL ==========
+        function showAdminPanel() {
+            document.getElementById('userDisplayName').innerHTML = 
+                `${currentUser.name} <span class="badge badge-admin">👑 Admin</span>`;
+            
+            document.getElementById('adminPanel').classList.remove('hidden');
+            document.getElementById('studentSection').classList.add('hidden');
+            document.getElementById('teacherStudentList').classList.add('hidden');
+            document.getElementById('teacherNotifications').classList.add('hidden');
+            document.getElementById('teacherRecordsView').classList.add('hidden');
+
+            loadAllUsers();
+        }
+
+        function loadAllUsers() {
+            const usersRef = ref(database, 'users');
+            onValue(usersRef, (snapshot) => {
+                allUsers = snapshot.val() || {};
+                updateAdminStats();
+                displayAllUsers();
+            });
+        }
+
+        function updateAdminStats() {
+            const users = Object.values(allUsers);
+            const students = users.filter(u => u.userType === 'student');
+            const teachers = users.filter(u => u.userType === 'teacher');
+
+            document.getElementById('totalUsersCount').textContent = users.length;
+            document.getElementById('totalStudentsCount').textContent = students.length;
+            document.getElementById('totalTeachersCount').textContent = teachers.length;
+        }
+
+        function displayAllUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            const users = Object.entries(allUsers);
+
+            if (users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #9ca3af; padding: 40px;">Henüz kullanıcı yok</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(([userId, user]) => {
+                const userTypeBadge = user.userType === 'student' 
+                    ? '<span class="badge badge-student">🎓 Öğrenci</span>' 
+                    : '<span class="badge badge-teacher">👨‍🏫 Öğretmen</span>';
+                
+                const createdDate = new Date(user.createdAt).toLocaleDateString('tr-TR');
+
+                return `
+                    <tr>
+                        <td><strong>${user.name}</strong></td>
+                        <td>${user.email}</td>
+                        <td>${userTypeBadge}</td>
+                        <td>${createdDate}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-small btn-warning" onclick="editUser('${userId}')">✏️ Düzenle</button>
+                                <button class="btn btn-small btn-danger" onclick="deleteUser('${userId}', '${user.name}')">🗑️ Sil</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        window.openAddUserModal = function() {
+            editingUserId = null;
+            document.getElementById('modalTitle').textContent = '➕ Kullanıcı Ekle';
+            document.getElementById('modalUserName').value = '';
+            document.getElementById('modalUserEmail').value = '';
+            document.getElementById('modalUserPassword').value = '';
+            document.getElementById('modalUserType').value = 'student';
+            document.getElementById('userModal').classList.add('active');
+        };
+
+        window.editUser = function(userId) {
+            editingUserId = userId;
+            const user = allUsers[userId];
+            
+            document.getElementById('modalTitle').textContent = '✏️ Kullanıcı Düzenle';
+            document.getElementById('modalUserName').value = user.name;
+            document.getElementById('modalUserEmail').value = user.email;
+            document.getElementById('modalUserPassword').value = user.password;
+            document.getElementById('modalUserType').value = user.userType;
+            document.getElementById('userModal').classList.add('active');
+        };
+
+        window.closeUserModal = function() {
+            document.getElementById('userModal').classList.remove('active');
+            editingUserId = null;
+        };
+
+        window.saveUser = async function() {
+            const name = document.getElementById('modalUserName').value.trim();
+            const email = document.getElementById('modalUserEmail').value.trim();
+            const password = document.getElementById('modalUserPassword').value;
+            const userType = document.getElementById('modalUserType').value;
+
+            if (!name || !email || !password) {
+                alert('Lütfen tüm alanları doldurun!');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Şifre en az 6 karakter olmalıdır!');
+                return;
+            }
+
+            try {
+                // E-posta kontrolü (düzenleme sırasında kendi e-postası hariç)
+                const existingUser = Object.entries(allUsers).find(([id, u]) => 
+                    u.email === email && id !== editingUserId
+                );
+                
+                if (existingUser) {
+                    alert('Bu e-posta adresi başka bir kullanıcı tarafından kullanılıyor!');
+                    return;
+                }
+
+                let userId = editingUserId;
+                if (!userId) {
+                    userId = 'user_' + Date.now();
+                }
+
+                // Kullanıcıyı kaydet
+                await set(ref(database, `users/${userId}`), {
+                    name: name,
+                    email: email,
+                    password: password,
+                    userType: userType,
+                    createdAt: editingUserId ? allUsers[editingUserId].createdAt : new Date().toISOString()
+                });
+
+                // Öğrenci/Öğretmen kaydını güncelle
+                if (userType === 'student') {
+                    await set(ref(database, `students/${userId}`), {
+                        name: name,
+                        email: email,
+                        teachers: []
+                    });
+                    
+                    // Eğer kategoriler yoksa oluştur
+                    const categoriesSnapshot = await get(ref(database, `categories/${userId}`));
+                    if (!categoriesSnapshot.exists()) {
+                        await set(ref(database, `categories/${userId}`), []);
+                    }
+                    
+                    // Eğer kayıtlar yoksa oluştur
+                    const recordsSnapshot = await get(ref(database, `records/${userId}`));
+                    if (!recordsSnapshot.exists()) {
+                        await set(ref(database, `records/${userId}`), []);
+                    }
+                } else {
+                    await set(ref(database, `teachers/${userId}`), {
+                        name: name,
+                        email: email,
+                        students: []
+                    });
+                }
+
+                alert(editingUserId ? '✅ Kullanıcı güncellendi!' : '✅ Kullanıcı eklendi!');
+                closeUserModal();
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        };
+
+        window.deleteUser = async function(userId, userName) {
+            if (!confirm(`"${userName}" kullanıcısını silmek istediğinize emin misiniz?\n\nBu işlem geri alınamaz ve kullanıcının tüm verileri silinecektir!`)) {
+                return;
+            }
+
+            try {
+                // Kullanıcıyı sil
+                await remove(ref(database, `users/${userId}`));
+                
+                // İlgili verileri sil
+                await remove(ref(database, `students/${userId}`));
+                await remove(ref(database, `teachers/${userId}`));
+                await remove(ref(database, `categories/${userId}`));
+                await remove(ref(database, `records/${userId}`));
+                await remove(ref(database, `notifications/${userId}`));
+
+                alert('✅ Kullanıcı başarıyla silindi!');
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        };
+
+        // ========== ÖĞRETMEN PANELİ ==========
         async function showTeacherInterface() {
             document.getElementById('teacherStudentList').classList.remove('hidden');
             document.getElementById('teacherNotifications').classList.remove('hidden');
             document.getElementById('teacherRecordsView').classList.remove('hidden');
             document.getElementById('studentSection').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
 
-            // Öğrencileri dinle
             const studentsRef = ref(database, 'students');
             onValue(studentsRef, (snapshot) => {
                 const students = [];
@@ -673,7 +1101,6 @@
                 displayTeacherRecords();
             });
 
-            // Bildirimleri dinle
             const notificationsRef = ref(database, `notifications/${currentUser.uid}`);
             onValue(notificationsRef, (snapshot) => {
                 const notifs = [];
@@ -690,8 +1117,8 @@
             document.getElementById('teacherStudentList').classList.add('hidden');
             document.getElementById('teacherNotifications').classList.add('hidden');
             document.getElementById('teacherRecordsView').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
 
-            // Kategorileri dinle
             const categoriesRef = ref(database, `categories/${currentUser.uid}`);
             onValue(categoriesRef, (snapshot) => {
                 categories = snapshot.val() || [];
@@ -699,7 +1126,6 @@
                 displayDynamicInputs();
             });
 
-            // Kayıtları dinle
             const recordsRef = ref(database, `records/${currentUser.uid}`);
             onValue(recordsRef, (snapshot) => {
                 records = snapshot.val() || [];
@@ -866,6 +1292,7 @@
             alert(details);
         };
 
+        // ========== ÖĞRENCİ FONKSİYONLARI ==========
         window.addCategory = async function() {
             const input = document.getElementById('newCategory');
             const categoryName = input.value.trim();
