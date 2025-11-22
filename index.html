@@ -148,7 +148,7 @@
 
         .input-grid {
             display: grid;
-            grid-template-columns: 200px 1fr;
+            grid-template-columns: 200px 200px;
             gap: 15px;
             margin-bottom: 20px;
         }
@@ -187,7 +187,7 @@
 
         .dynamic-inputs {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
             gap: 15px;
         }
 
@@ -304,14 +304,14 @@
     <div class="container">
         <div class="header">
             <h1>📚 Çalışma Takip Sistemi</h1>
-            <p>Kendi kategorilerini oluştur ve çalışmalarını takip et</p>
+            <p>Kendi kategorilerini oluştur ve çalışmalarını detaylı takip et</p>
         </div>
 
         <div class="card">
             <h2>🏷️ Kategorileri Yönet</h2>
             <div class="categories-section">
                 <div class="category-input-group">
-                    <input type="text" id="newCategory" placeholder="Kategori adı (örn: Paragraf, Matematik 20d 5y, Soru)">
+                    <input type="text" id="newCategory" placeholder="Kategori adı (örn: Matematik, Fizik, Türkçe)">
                     <button class="btn btn-small" onclick="addCategory()">➕ Kategori Ekle</button>
                 </div>
                 <div class="categories-list" id="categoriesList"></div>
@@ -327,7 +327,20 @@
                     <label>📅 Tarih</label>
                     <input type="date" id="tarih">
                 </div>
+                <div class="input-group">
+                    <label>⏱️ Çalışma Süresi</label>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="number" id="calismaSaati" placeholder="Saat" min="0" style="flex: 1;">
+                        <input type="number" id="calismaDakika" placeholder="Dakika" min="0" max="59" style="flex: 1;">
+                    </div>
+                </div>
             </div>
+            
+            <div class="input-group" style="margin-bottom: 20px;">
+                <label>📝 Genel Notlar (İsteğe Bağlı)</label>
+                <textarea id="notlar" placeholder="Örn: Verimli bir gün geçirdim, yeni konuları anladım..." rows="3"></textarea>
+            </div>
+
             <div class="dynamic-inputs" id="dynamicInputs"></div>
             <button class="btn" onclick="addRecord()" style="margin-top: 20px;">💾 Kaydet</button>
         </div>
@@ -413,6 +426,9 @@
 
         function addRecord() {
             const tarih = document.getElementById('tarih').value;
+            const calismaSaati = document.getElementById('calismaSaati').value;
+            const calismaDakika = document.getElementById('calismaDakika').value;
+            const notlar = document.getElementById('notlar').value.trim();
             
             if (!tarih) {
                 alert('Lütfen tarih seçin!');
@@ -428,28 +444,59 @@
             let hasValue = false;
 
             categories.forEach(category => {
-                const value = document.getElementById('input_' + category).value.trim();
-                data[category] = value;
-                if (value) hasValue = true;
+                const dogru = document.getElementById('input_dogru_' + category).value.trim();
+                const yanlis = document.getElementById('input_yanlis_' + category).value.trim();
+                const not = document.getElementById('input_not_' + category).value.trim();
+                
+                if (dogru || yanlis || not) {
+                    data[category] = {
+                        dogru: dogru || '0',
+                        yanlis: yanlis || '0',
+                        not: not || ''
+                    };
+                    hasValue = true;
+                }
             });
 
-            if (!hasValue) {
+            if (!hasValue && !calismaSaati && !calismaDakika && !notlar) {
                 alert('Lütfen en az bir değer girin!');
                 return;
+            }
+
+            // Süreyi formatla
+            let calismaSuresi = '';
+            if (calismaSaati || calismaDakika) {
+                const saat = parseInt(calismaSaati) || 0;
+                const dakika = parseInt(calismaDakika) || 0;
+                if (saat > 0 && dakika > 0) {
+                    calismaSuresi = `${saat} saat ${dakika} dk`;
+                } else if (saat > 0) {
+                    calismaSuresi = `${saat} saat`;
+                } else if (dakika > 0) {
+                    calismaSuresi = `${dakika} dk`;
+                }
             }
 
             records.push({
                 id: Date.now(),
                 tarih: tarih,
+                calismaSuresi: calismaSuresi,
+                notlar: notlar,
                 data: data
             });
 
             saveData();
             updateDisplay();
 
+            // Formu temizle
             categories.forEach(category => {
-                document.getElementById('input_' + category).value = '';
+                document.getElementById('input_dogru_' + category).value = '';
+                document.getElementById('input_yanlis_' + category).value = '';
+                document.getElementById('input_not_' + category).value = '';
             });
+            document.getElementById('calismaSaati').value = '';
+            document.getElementById('calismaDakika').value = '';
+            document.getElementById('notlar').value = '';
             document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
         }
 
@@ -484,12 +531,22 @@
             }
 
             // CSV formatında oluştur
-            let csv = 'Tarih,' + categories.join(',') + '\n';
+            let csv = 'Tarih,Çalışma Süresi (Saat),Genel Notlar';
+            categories.forEach(cat => {
+                csv += `,${cat} (Doğru),${cat} (Yanlış),${cat} (Not)`;
+            });
+            csv += '\n';
             
             filteredRecords.sort((a, b) => new Date(a.tarih) - new Date(b.tarih)).forEach(record => {
-                const row = [record.tarih];
+                const row = [record.tarih, record.calismaSuresi || '', `"${(record.notlar || '').replace(/"/g, '""')}"`];
                 categories.forEach(cat => {
-                    row.push(record.data[cat] || '');
+                    if (record.data[cat]) {
+                        row.push(record.data[cat].dogru || '0');
+                        row.push(record.data[cat].yanlis || '0');
+                        row.push(`"${(record.data[cat].not || '').replace(/"/g, '""')}"`);
+                    } else {
+                        row.push('', '', '');
+                    }
                 });
                 csv += row.join(',') + '\n';
             });
@@ -548,7 +605,11 @@
             container.innerHTML = categories.map(category => `
                 <div class="input-group">
                     <label>${category}</label>
-                    <textarea id="input_${category}" placeholder="20d 5y veya sadece 25 gibi yazabilirsiniz" rows="2"></textarea>
+                    <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                        <input type="number" id="input_dogru_${category}" placeholder="Doğru" min="0" style="flex: 1;">
+                        <input type="number" id="input_yanlis_${category}" placeholder="Yanlış" min="0" style="flex: 1;">
+                    </div>
+                    <textarea id="input_not_${category}" placeholder="Ek not (örn: geometri konusu dinlendi...)" rows="2"></textarea>
                 </div>
             `).join('');
         }
@@ -591,6 +652,8 @@
                         <thead>
                             <tr>
                                 <th>Tarih</th>
+                                <th>Süre (Saat)</th>
+                                <th>Genel Notlar</th>
                                 ${categories.map(cat => `<th>${cat}</th>`).join('')}
                                 <th>İşlem</th>
                             </tr>
@@ -608,7 +671,23 @@
                 html += `
                     <tr>
                         <td><strong>${formattedDate}</strong></td>
-                        ${categories.map(cat => `<td>${record.data[cat] || '-'}</td>`).join('')}
+                        <td>${record.calismaSuresi || '-'}</td>
+                        <td style="max-width: 200px; white-space: pre-wrap;">${record.notlar || '-'}</td>
+                        ${categories.map(cat => {
+                            if (record.data[cat]) {
+                                const d = record.data[cat];
+                                let result = `<div style="font-size: 0.9em;">`;
+                                if (d.dogru !== '0' || d.yanlis !== '0') {
+                                    result += `✅ ${d.dogru} ❌ ${d.yanlis}`;
+                                }
+                                if (d.not) {
+                                    result += `<br><small style="color: #6b7280;">${d.not}</small>`;
+                                }
+                                result += `</div>`;
+                                return `<td>${result}</td>`;
+                            }
+                            return `<td>-</td>`;
+                        }).join('')}
                         <td>
                             <button class="delete-btn" onclick="deleteRecord(${record.id})">🗑️ Sil</button>
                         </td>
