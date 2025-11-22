@@ -12,15 +12,37 @@
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-color: #f5f5f5;
+            --card-bg: white;
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --border-color: #e5e7eb;
+        }
+
+        body.dark-mode {
+            --bg-color: #1a1a2e;
+            --card-bg: #16213e;
+            --text-primary: #eee;
+            --text-secondary: #aaa;
+            --border-color: #2d3748;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: var(--primary-gradient);
             min-height: 100vh;
             padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #2d3561 0%, #3d2d5a 100%);
         }
 
         .container {
-            max-width: 1200px;
+            max-width: 1400px;
             margin: 0 auto;
         }
 
@@ -28,6 +50,7 @@
             text-align: center;
             color: white;
             margin-bottom: 30px;
+            position: relative;
         }
 
         .header h1 {
@@ -35,16 +58,38 @@
             margin-bottom: 10px;
         }
 
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            color: white;
+            z-index: 1000;
+            transition: transform 0.3s;
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+        }
+
         .card {
-            background: white;
+            background: var(--card-bg);
             border-radius: 20px;
             padding: 30px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.2);
             margin-bottom: 30px;
+            transition: all 0.3s ease;
         }
 
         .card h2 {
-            color: #1f2937;
+            color: var(--text-primary);
             margin-bottom: 20px;
             font-size: 1.8em;
         }
@@ -85,7 +130,7 @@
 
         .input-group label {
             display: block;
-            color: #374151;
+            color: var(--text-primary);
             font-weight: 600;
             margin-bottom: 8px;
         }
@@ -93,11 +138,13 @@
         .input-group input, .input-group select, .input-group textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e5e7eb;
+            border: 2px solid var(--border-color);
             border-radius: 10px;
             font-size: 1em;
             transition: all 0.3s;
             font-family: inherit;
+            background: var(--card-bg);
+            color: var(--text-primary);
         }
 
         .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
@@ -142,6 +189,10 @@
             background: #f59e0b;
         }
 
+        .btn-info {
+            background: #3b82f6;
+        }
+
         .user-info {
             background: rgba(255,255,255,0.2);
             backdrop-filter: blur(10px);
@@ -151,11 +202,19 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .user-info span {
             color: white;
             font-weight: 600;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
         }
 
         .notifications-panel {
@@ -164,6 +223,11 @@
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 20px;
+        }
+
+        body.dark-mode .notifications-panel {
+            background: #2d2410;
+            border-color: #f59e0b;
         }
 
         .notification-item {
@@ -175,6 +239,11 @@
             justify-content: space-between;
             align-items: center;
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .notification-item {
+            background: #1a1a2e;
+            color: #eee;
         }
 
         .notification-item.unread {
@@ -196,6 +265,11 @@
             transition: all 0.3s;
         }
 
+        body.dark-mode .student-card {
+            background: #1a1a2e;
+            border-color: #2d3748;
+        }
+
         .student-card:hover {
             border-color: #667eea;
             box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
@@ -206,13 +280,17 @@
             border-color: #3b82f6;
         }
 
+        body.dark-mode .student-card.tracking {
+            background: #1e3a5f;
+        }
+
         .student-card h3 {
-            color: #1f2937;
+            color: var(--text-primary);
             margin-bottom: 10px;
         }
 
         .student-card p {
-            color: #6b7280;
+            color: var(--text-secondary);
             font-size: 0.9em;
             margin-bottom: 15px;
         }
@@ -222,6 +300,10 @@
             padding: 20px;
             background: #f3f4f6;
             border-radius: 15px;
+        }
+
+        body.dark-mode .categories-section {
+            background: #0f1419;
         }
 
         .category-input-group {
@@ -249,6 +331,10 @@
             align-items: center;
             gap: 10px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .category-tag {
+            background: #1a1a2e;
         }
 
         .remove-category {
@@ -282,10 +368,20 @@
             border-bottom: 2px solid #e5e7eb;
         }
 
+        body.dark-mode .records-table th {
+            background: #0f1419;
+            color: #eee;
+            border-color: #2d3748;
+        }
+
         .records-table td {
             padding: 15px;
             border-bottom: 1px solid #e5e7eb;
-            color: #4b5563;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .records-table td {
+            border-color: #2d3748;
         }
 
         .delete-btn {
@@ -351,7 +447,7 @@
             background: rgba(34, 197, 94, 0.3);
         }
 
-        /* Admin Panel Styles */
+        /* Admin Panel */
         .admin-stats {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -379,7 +475,7 @@
         }
 
         .users-table-container {
-            background: white;
+            background: var(--card-bg);
             border-radius: 15px;
             padding: 20px;
             overflow-x: auto;
@@ -399,13 +495,28 @@
             border-bottom: 2px solid #e5e7eb;
         }
 
+        body.dark-mode .users-table th {
+            background: #0f1419;
+            color: #eee;
+            border-color: #2d3748;
+        }
+
         .users-table td {
             padding: 15px;
             border-bottom: 1px solid #e5e7eb;
+            color: var(--text-primary);
+        }
+
+        body.dark-mode .users-table td {
+            border-color: #2d3748;
         }
 
         .users-table tr:hover {
             background: #f9fafb;
+        }
+
+        body.dark-mode .users-table tr:hover {
+            background: #1a1a2e;
         }
 
         .action-buttons {
@@ -432,10 +543,10 @@
         }
 
         .modal-content {
-            background: white;
+            background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
-            max-width: 500px;
+            max-width: 600px;
             width: 90%;
             max-height: 80vh;
             overflow-y: auto;
@@ -448,11 +559,11 @@
             align-items: center;
             margin-bottom: 20px;
             padding-bottom: 15px;
-            border-bottom: 2px solid #e5e7eb;
+            border-bottom: 2px solid var(--border-color);
         }
 
         .modal-header h3 {
-            color: #1f2937;
+            color: var(--text-primary);
             font-size: 1.5em;
         }
 
@@ -479,14 +590,300 @@
             text-align: center;
         }
 
+        /* Calendar (GitHub Style) */
+        .calendar-container {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(53, 1fr);
+            gap: 3px;
+            margin-top: 20px;
+        }
+
+        .calendar-cell {
+            aspect-ratio: 1;
+            background: #eee;
+            border-radius: 3px;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        body.dark-mode .calendar-cell {
+            background: #2d3748;
+        }
+
+        .calendar-cell:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+
+        .calendar-cell.level-0 { background: #ebedf0; }
+        .calendar-cell.level-1 { background: #9be9a8; }
+        .calendar-cell.level-2 { background: #40c463; }
+        .calendar-cell.level-3 { background: #30a14e; }
+        .calendar-cell.level-4 { background: #216e39; }
+
+        body.dark-mode .calendar-cell.level-0 { background: #161b22; }
+        body.dark-mode .calendar-cell.level-1 { background: #0e4429; }
+        body.dark-mode .calendar-cell.level-2 { background: #006d32; }
+        body.dark-mode .calendar-cell.level-3 { background: #26a641; }
+        body.dark-mode .calendar-cell.level-4 { background: #39d353; }
+
+        .calendar-legend {
+            display: flex;
+            gap: 5px;
+            align-items: center;
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .legend-item {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        /* Messages */
+        .messages-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        body.dark-mode .messages-container {
+            background: #0f1419;
+        }
+
+        .message-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .message-item {
+            background: #1a1a2e;
+        }
+
+        .message-item.sent {
+            background: #eff6ff;
+            margin-left: auto;
+            max-width: 80%;
+        }
+
+        body.dark-mode .message-item.sent {
+            background: #1e3a5f;
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .message-time {
+            color: var(--text-secondary);
+            font-size: 0.85em;
+        }
+
+        .message-body {
+            color: var(--text-primary);
+        }
+
+        /* Homework/Tasks */
+        .homework-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .homework-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+
+        body.dark-mode .homework-card {
+            background: #1a1a2e;
+        }
+
+        .homework-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .homework-card.completed {
+            border-left-color: #10b981;
+            opacity: 0.7;
+        }
+
+        .homework-card.overdue {
+            border-left-color: #ef4444;
+        }
+
+        .homework-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .homework-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .homework-description {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .homework-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Profile */
+        .profile-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .profile-sidebar {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            border: 5px solid #667eea;
+            cursor: pointer;
+        }
+
+        .profile-avatar-placeholder {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 4em;
+            color: white;
+            cursor: pointer;
+        }
+
+        .profile-name {
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .profile-email {
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .profile-stats {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        body.dark-mode .profile-stats {
+            background: #0f1419;
+        }
+
+        .profile-stat {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .profile-stat:last-child {
+            border-bottom: none;
+        }
+
+        .profile-main {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .profile-section {
+            margin-bottom: 30px;
+        }
+
+        .profile-section h3 {
+            color: var(--text-primary);
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
         @media (max-width: 768px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+            
             .action-buttons {
                 flex-direction: column;
+            }
+
+            .calendar-grid {
+                grid-template-columns: repeat(26, 1fr);
             }
         }
     </style>
 </head>
 <body>
+    <!-- Tema Değiştirme Butonu -->
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeToggle">🌙</button>
+
     <!-- Giriş/Kayıt Ekranı -->
     <div id="authScreen">
         <div class="header">
@@ -549,7 +946,57 @@
                 <div class="status-badge connected">✅ Çevrimiçi</div>
                 <div class="user-info">
                     <span id="userDisplayName"></span>
-                    <button class="btn btn-small btn-danger" onclick="logout()">Çıkış Yap</button>
+                    <div class="user-actions">
+                        <button class="btn btn-small btn-info" onclick="showProfile()" id="profileBtn">👤 Profil</button>
+                        <button class="btn btn-small btn-danger" onclick="logout()">Çıkış Yap</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profil Sayfası -->
+            <div id="profileSection" class="hidden">
+                <div class="profile-container">
+                    <div class="profile-sidebar card">
+                        <div id="profileAvatarContainer"></div>
+                        <input type="file" id="avatarUpload" accept="image/*" style="display: none;" onchange="uploadAvatar()">
+                        <div class="profile-name" id="profileName"></div>
+                        <div class="profile-email" id="profileEmail"></div>
+                        <div class="profile-stats">
+                            <div class="profile-stat">
+                                <span>⏱️ Toplam Çalışma</span>
+                                <strong id="totalStudyTime">0 saat</strong>
+                            </div>
+                            <div class="profile-stat">
+                                <span>📝 Toplam Kayıt</span>
+                                <strong id="totalRecords">0</strong>
+                            </div>
+                            <div class="profile-stat">
+                                <span>🎯 Tamamlanan Ödev</span>
+                                <strong id="completedHomework">0</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="profile-main">
+                        <div class="profile-section">
+                            <h3>📝 Hakkımda</h3>
+                            <div class="input-group">
+                                <textarea id="profileBio" rows="4" placeholder="Kendiniz hakkında birkaç kelime yazın..."></textarea>
+                            </div>
+                            <button class="btn btn-small btn-success" onclick="updateProfile()">💾 Kaydet</button>
+                        </div>
+                        <div class="profile-section">
+                            <h3>🔧 Hesap Ayarları</h3>
+                            <div class="input-group">
+                                <label>📧 E-posta</label>
+                                <input type="email" id="profileEmailEdit" disabled>
+                            </div>
+                            <div class="input-group">
+                                <label>🔒 Yeni Şifre (değiştirmek için)</label>
+                                <input type="password" id="profileNewPassword" placeholder="Yeni şifre">
+                            </div>
+                            <button class="btn btn-small btn-warning" onclick="updatePassword()">🔐 Şifre Değiştir</button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -591,9 +1038,7 @@
                                     <th>İşlemler</th>
                                 </tr>
                             </thead>
-                            <tbody id="usersTableBody">
-                                <!-- Kullanıcılar buraya gelecek -->
-                            </tbody>
+                            <tbody id="usersTableBody"></tbody>
                         </table>
                     </div>
                 </div>
@@ -602,12 +1047,67 @@
             <!-- Öğretmen Bildirimleri -->
             <div id="teacherNotifications" class="hidden"></div>
 
+            <!-- Öğretmen - Ödevler -->
+            <div id="teacherHomeworkSection" class="hidden">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">📝 Ödevler</h2>
+                        <button class="btn btn-small btn-success" onclick="openHomeworkModal()">➕ Ödev Oluştur</button>
+                    </div>
+                    <div id="teacherHomeworkList"></div>
+                </div>
+            </div>
+
+            <!-- Öğretmen - Mesajlaşma -->
+            <div id="teacherMessagesSection" class="hidden">
+                <div class="card">
+                    <h2>💬 Mesajlaşma</h2>
+                    <div id="teacherStudentSelect" style="margin-bottom: 20px;"></div>
+                    <div id="teacherMessagesContainer"></div>
+                </div>
+            </div>
+
             <!-- Öğretmen - Öğrenci Listesi -->
             <div id="teacherStudentList" class="hidden">
                 <div class="card">
                     <h2>👥 Öğrenci Listesi</h2>
-                    <p style="color: #6b7280; margin-bottom: 20px;">Takip etmek istediğiniz öğrencileri seçin</p>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Takip etmek istediğiniz öğrencileri seçin</p>
                     <div id="studentsGrid" class="students-grid"></div>
+                </div>
+            </div>
+
+            <!-- Öğrenci - Takvim -->
+            <div id="studentCalendar" class="hidden">
+                <div class="card calendar-container">
+                    <h2>📅 Çalışma Takvimi</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 10px;">Son 365 günlük çalışma aktiviteniz</p>
+                    <div class="calendar-grid" id="calendarGrid"></div>
+                    <div class="calendar-legend">
+                        <span style="margin-right: 10px;">Az</span>
+                        <div class="legend-item level-0"></div>
+                        <div class="legend-item level-1"></div>
+                        <div class="legend-item level-2"></div>
+                        <div class="legend-item level-3"></div>
+                        <div class="legend-item level-4"></div>
+                        <span style="margin-left: 10px;">Çok</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Öğrenci - Ödevler -->
+            <div id="studentHomeworkSection" class="hidden">
+                <div class="card">
+                    <h2>📝 Ödevlerim</h2>
+                    <div id="studentHomeworkList"></div>
+                </div>
+            </div>
+
+            <!-- Öğrenci - Mesajlaşma -->
+            <div id="studentMessagesSection" class="hidden">
+                <div class="card">
+                    <h2>💬 Öğretmenlerimle Mesajlaşma</h2>
+                    <div id="studentTeacherSelect" style="margin-bottom: 20px;"></div>
+                    <div id="studentMessagesContainer"></div>
                 </div>
             </div>
 
@@ -695,6 +1195,51 @@
         </div>
     </div>
 
+    <!-- Ödev Oluşturma/Düzenleme Modal -->
+    <div id="homeworkModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="homeworkModalTitle">➕ Ödev Oluştur</h3>
+                <button class="close-modal" onclick="closeHomeworkModal()">✕</button>
+            </div>
+            <div class="input-group">
+                <label>📌 Ödev Başlığı</label>
+                <input type="text" id="homeworkTitle" placeholder="Ödev başlığı">
+            </div>
+            <div class="input-group">
+                <label>📝 Açıklama</label>
+                <textarea id="homeworkDescription" rows="4" placeholder="Ödev açıklaması ve talimatlar..."></textarea>
+            </div>
+            <div class="input-group">
+                <label>📅 Son Teslim Tarihi</label>
+                <input type="date" id="homeworkDueDate">
+            </div>
+            <div class="input-group">
+                <label>👥 Öğrenci Seç</label>
+                <select id="homeworkStudentSelect" multiple style="min-height: 150px;">
+                    <!-- Öğrenciler buraya gelecek -->
+                </select>
+                <small style="color: var(--text-secondary);">Ctrl/Cmd tuşu ile birden fazla seçebilirsiniz</small>
+            </div>
+            <button class="btn" onclick="saveHomework()">📤 Ödev Oluştur</button>
+        </div>
+    </div>
+
+    <!-- Mesaj Gönderme Modal -->
+    <div id="messageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>💬 Mesaj Gönder</h3>
+                <button class="close-modal" onclick="closeMessageModal()">✕</button>
+            </div>
+            <div class="messages-container" id="modalMessagesContainer"></div>
+            <div class="input-group">
+                <textarea id="messageText" rows="3" placeholder="Mesajınızı yazın..."></textarea>
+            </div>
+            <button class="btn" onclick="sendMessage()">📨 Gönder</button>
+        </div>
+    </div>
+
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, get, onValue, push, update, remove } 
@@ -720,19 +1265,34 @@
         let allStudents = [];
         let allUsers = {};
         let notifications = [];
+        let homeworks = [];
+        let messages = {};
         let editingUserId = null;
+        let selectedMessageRecipient = null;
 
-        // Admin bilgileri
         const ADMIN_EMAIL = 'admin@gmail.com';
         const ADMIN_PASSWORD = 'admin123';
 
-        // Sayfa yüklendiğinde oturum kontrolü
+        // Tema Kontrolü
         window.onload = function() {
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+            }
+
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = JSON.parse(savedUser);
                 showMainScreen();
             }
+        };
+
+        window.toggleTheme = function() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.getElementById('themeToggle').textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         };
 
         window.switchAuthTab = function(tab) {
@@ -787,7 +1347,9 @@
                     email: email,
                     password: password,
                     userType: userType,
-                    createdAt: new Date().toISOString()
+                    createdAt: new Date().toISOString(),
+                    bio: '',
+                    avatar: ''
                 });
 
                 if (userType === 'student') {
@@ -823,7 +1385,6 @@
                 return;
             }
 
-            // Admin kontrolü
             if (email === ADMIN_EMAIL && password === ADMIN_PASSWORD) {
                 currentUser = {
                     uid: 'admin',
@@ -892,16 +1453,148 @@
             }
         }
 
+        // ========== PROFIL ==========
+        window.showProfile = function() {
+            // Tüm bölümleri gizle
+            hideAllSections();
+            
+            document.getElementById('profileSection').classList.remove('hidden');
+            loadProfile();
+        };
+
+        function hideAllSections() {
+            document.getElementById('profileSection').classList.add('hidden');
+            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('teacherNotifications').classList.add('hidden');
+            document.getElementById('teacherHomeworkSection').classList.add('hidden');
+            document.getElementById('teacherMessagesSection').classList.add('hidden');
+            document.getElementById('teacherStudentList').classList.add('hidden');
+            document.getElementById('teacherRecordsView').classList.add('hidden');
+            document.getElementById('studentCalendar').classList.add('hidden');
+            document.getElementById('studentHomeworkSection').classList.add('hidden');
+            document.getElementById('studentMessagesSection').classList.add('hidden');
+            document.getElementById('studentSection').classList.add('hidden');
+        }
+
+        async function loadProfile() {
+            document.getElementById('profileName').textContent = currentUser.name;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('profileEmailEdit').value = currentUser.email;
+            document.getElementById('profileBio').value = currentUser.bio || '';
+
+            // Avatar
+            const avatarContainer = document.getElementById('profileAvatarContainer');
+            if (currentUser.avatar) {
+                avatarContainer.innerHTML = `<img src="${currentUser.avatar}" class="profile-avatar" onclick="document.getElementById('avatarUpload').click()">`;
+            } else {
+                const initial = currentUser.name.charAt(0).toUpperCase();
+                avatarContainer.innerHTML = `<div class="profile-avatar-placeholder" onclick="document.getElementById('avatarUpload').click()">${initial}</div>`;
+            }
+
+            // İstatistikler
+            if (currentUser.userType === 'student') {
+                const recordsRef = ref(database, `records/${currentUser.uid}`);
+                const snapshot = await get(recordsRef);
+                const userRecords = snapshot.val() || [];
+                
+                document.getElementById('totalRecords').textContent = userRecords.length;
+                
+                // Toplam çalışma süresi hesapla
+                let totalMinutes = 0;
+                userRecords.forEach(record => {
+                    if (record.calismaSuresi) {
+                        const match = record.calismaSuresi.match(/(\d+)\s*saat|(\d+)\s*dk/g);
+                        if (match) {
+                            match.forEach(part => {
+                                if (part.includes('saat')) {
+                                    totalMinutes += parseInt(part) * 60;
+                                } else if (part.includes('dk')) {
+                                    totalMinutes += parseInt(part);
+                                }
+                            });
+                        }
+                    }
+                });
+                
+                const hours = Math.floor(totalMinutes / 60);
+                document.getElementById('totalStudyTime').textContent = `${hours} saat`;
+
+                // Tamamlanan ödevler
+                const homeworkRef = ref(database, 'homeworks');
+                const hwSnapshot = await get(homeworkRef);
+                const allHomework = hwSnapshot.val() || {};
+                let completed = 0;
+                Object.values(allHomework).forEach(hw => {
+                    if (hw.studentId === currentUser.uid && hw.status === 'completed') {
+                        completed++;
+                    }
+                });
+                document.getElementById('completedHomework').textContent = completed;
+            }
+        }
+
+        window.uploadAvatar = function() {
+            const file = document.getElementById('avatarUpload').files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                    const avatarUrl = e.target.result;
+                    currentUser.avatar = avatarUrl;
+                    
+                    await update(ref(database, `users/${currentUser.uid}`), {
+                        avatar: avatarUrl
+                    });
+                    
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    loadProfile();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.updateProfile = async function() {
+            const bio = document.getElementById('profileBio').value.trim();
+            
+            await update(ref(database, `users/${currentUser.uid}`), {
+                bio: bio
+            });
+            
+            currentUser.bio = bio;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            alert('✅ Profil güncellendi!');
+        };
+
+        window.updatePassword = async function() {
+            const newPassword = document.getElementById('profileNewPassword').value;
+            
+            if (!newPassword) {
+                alert('Lütfen yeni şifrenizi girin!');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                alert('Şifre en az 6 karakter olmalıdır!');
+                return;
+            }
+            
+            await update(ref(database, `users/${currentUser.uid}`), {
+                password: newPassword
+            });
+            
+            currentUser.password = newPassword;
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+            document.getElementById('profileNewPassword').value = '';
+            alert('✅ Şifre değiştirildi!');
+        };
+
         // ========== ADMIN PANEL ==========
         function showAdminPanel() {
             document.getElementById('userDisplayName').innerHTML = 
                 `${currentUser.name} <span class="badge badge-admin">👑 Admin</span>`;
             
+            document.getElementById('profileBtn').classList.add('hidden');
+            hideAllSections();
             document.getElementById('adminPanel').classList.remove('hidden');
-            document.getElementById('studentSection').classList.add('hidden');
-            document.getElementById('teacherStudentList').classList.add('hidden');
-            document.getElementById('teacherNotifications').classList.add('hidden');
-            document.getElementById('teacherRecordsView').classList.add('hidden');
 
             loadAllUsers();
         }
@@ -1002,7 +1695,6 @@
             }
 
             try {
-                // E-posta kontrolü (düzenleme sırasında kendi e-postası hariç)
                 const existingUser = Object.entries(allUsers).find(([id, u]) => 
                     u.email === email && id !== editingUserId
                 );
@@ -1017,16 +1709,16 @@
                     userId = 'user_' + Date.now();
                 }
 
-                // Kullanıcıyı kaydet
                 await set(ref(database, `users/${userId}`), {
                     name: name,
                     email: email,
                     password: password,
                     userType: userType,
+                    bio: editingUserId ? allUsers[editingUserId].bio || '' : '',
+                    avatar: editingUserId ? allUsers[editingUserId].avatar || '' : '',
                     createdAt: editingUserId ? allUsers[editingUserId].createdAt : new Date().toISOString()
                 });
 
-                // Öğrenci/Öğretmen kaydını güncelle
                 if (userType === 'student') {
                     await set(ref(database, `students/${userId}`), {
                         name: name,
@@ -1034,13 +1726,11 @@
                         teachers: []
                     });
                     
-                    // Eğer kategoriler yoksa oluştur
                     const categoriesSnapshot = await get(ref(database, `categories/${userId}`));
                     if (!categoriesSnapshot.exists()) {
                         await set(ref(database, `categories/${userId}`), []);
                     }
                     
-                    // Eğer kayıtlar yoksa oluştur
                     const recordsSnapshot = await get(ref(database, `records/${userId}`));
                     if (!recordsSnapshot.exists()) {
                         await set(ref(database, `records/${userId}`), []);
@@ -1066,10 +1756,7 @@
             }
 
             try {
-                // Kullanıcıyı sil
                 await remove(ref(database, `users/${userId}`));
-                
-                // İlgili verileri sil
                 await remove(ref(database, `students/${userId}`));
                 await remove(ref(database, `teachers/${userId}`));
                 await remove(ref(database, `categories/${userId}`));
@@ -1084,11 +1771,12 @@
 
         // ========== ÖĞRETMEN PANELİ ==========
         async function showTeacherInterface() {
+            hideAllSections();
             document.getElementById('teacherStudentList').classList.remove('hidden');
             document.getElementById('teacherNotifications').classList.remove('hidden');
             document.getElementById('teacherRecordsView').classList.remove('hidden');
-            document.getElementById('studentSection').classList.add('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('teacherHomeworkSection').classList.remove('hidden');
+            document.getElementById('teacherMessagesSection').classList.remove('hidden');
 
             const studentsRef = ref(database, 'students');
             onValue(studentsRef, (snapshot) => {
@@ -1099,6 +1787,8 @@
                 allStudents = students;
                 displayStudentsList();
                 displayTeacherRecords();
+                loadTeacherHomeworks();
+                loadTeacherMessages();
             });
 
             const notificationsRef = ref(database, `notifications/${currentUser.uid}`);
@@ -1112,12 +1802,396 @@
             });
         }
 
+        // ========== TAKVIM (GITHUB STYLE) ==========
+        function generateCalendar() {
+            const container = document.getElementById('calendarGrid');
+            const today = new Date();
+            const cells = [];
+            
+            // Son 365 gün için hücreler oluştur
+            for (let i = 364; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+                
+                // O gün çalışma var mı kontrol et
+                const dayRecords = records.filter(r => r.tarih === dateStr);
+                let level = 0;
+                
+                if (dayRecords.length > 0) {
+                    // Çalışma süresine göre seviye belirle
+                    let totalMinutes = 0;
+                    dayRecords.forEach(record => {
+                        if (record.calismaSuresi) {
+                            const match = record.calismaSuresi.match(/(\d+)\s*saat|(\d+)\s*dk/g);
+                            if (match) {
+                                match.forEach(part => {
+                                    if (part.includes('saat')) {
+                                        totalMinutes += parseInt(part) * 60;
+                                    } else if (part.includes('dk')) {
+                                        totalMinutes += parseInt(part);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                    
+                    if (totalMinutes > 0) level = 1;
+                    if (totalMinutes >= 60) level = 2;
+                    if (totalMinutes >= 120) level = 3;
+                    if (totalMinutes >= 180) level = 4;
+                }
+                
+                const title = `${dateStr}: ${dayRecords.length} kayıt`;
+                cells.push(`<div class="calendar-cell level-${level}" title="${title}"></div>`);
+            }
+            
+            container.innerHTML = cells.join('');
+        }
+
+        // ========== ÖDEV SİSTEMİ ==========
+        window.openHomeworkModal = function() {
+            document.getElementById('homeworkModalTitle').textContent = '➕ Ödev Oluştur';
+            document.getElementById('homeworkTitle').value = '';
+            document.getElementById('homeworkDescription').value = '';
+            document.getElementById('homeworkDueDate').value = '';
+            
+            // Takip edilen öğrencileri listele
+            const select = document.getElementById('homeworkStudentSelect');
+            const trackingStudents = allStudents.filter(s => 
+                s.teachers && s.teachers.includes(currentUser.uid)
+            );
+            
+            select.innerHTML = trackingStudents.map(student => 
+                `<option value="${student.id}">${student.name}</option>`
+            ).join('');
+            
+            document.getElementById('homeworkModal').classList.add('active');
+        };
+
+        window.closeHomeworkModal = function() {
+            document.getElementById('homeworkModal').classList.remove('active');
+        };
+
+        window.saveHomework = async function() {
+            const title = document.getElementById('homeworkTitle').value.trim();
+            const description = document.getElementById('homeworkDescription').value.trim();
+            const dueDate = document.getElementById('homeworkDueDate').value;
+            const select = document.getElementById('homeworkStudentSelect');
+            const selectedStudents = Array.from(select.selectedOptions).map(opt => opt.value);
+
+            if (!title || !description || !dueDate || selectedStudents.length === 0) {
+                alert('Lütfen tüm alanları doldurun ve en az bir öğrenci seçin!');
+                return;
+            }
+
+            try {
+                for (const studentId of selectedStudents) {
+                    const homeworkId = 'hw_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    await set(ref(database, `homeworks/${homeworkId}`), {
+                        title: title,
+                        description: description,
+                        dueDate: dueDate,
+                        teacherId: currentUser.uid,
+                        teacherName: currentUser.name,
+                        studentId: studentId,
+                        status: 'pending',
+                        createdAt: new Date().toISOString()
+                    });
+
+                    // Öğrenciye bildirim gönder
+                    const notifRef = push(ref(database, `notifications/${studentId}`));
+                    await set(notifRef, {
+                        type: 'homework',
+                        message: `${currentUser.name} size yeni ödev verdi: ${title}`,
+                        timestamp: Date.now(),
+                        read: false
+                    });
+                }
+
+                alert('✅ Ödev başarıyla oluşturuldu!');
+                closeHomeworkModal();
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        };
+
+        async function loadTeacherHomeworks() {
+            const homeworkRef = ref(database, 'homeworks');
+            onValue(homeworkRef, (snapshot) => {
+                const allHomework = [];
+                snapshot.forEach((child) => {
+                    const hw = { id: child.key, ...child.val() };
+                    if (hw.teacherId === currentUser.uid) {
+                        allHomework.push(hw);
+                    }
+                });
+                displayTeacherHomeworks(allHomework);
+            });
+        }
+
+        function displayTeacherHomeworks(homeworkList) {
+            const container = document.getElementById('teacherHomeworkList');
+            
+            if (homeworkList.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">Henüz ödev oluşturmadınız.</p>';
+                return;
+            }
+
+            container.innerHTML = `<div class="homework-grid">${homeworkList.map(hw => {
+                const student = allStudents.find(s => s.id === hw.studentId);
+                const studentName = student ? student.name : 'Bilinmeyen';
+                const dueDate = new Date(hw.dueDate).toLocaleDateString('tr-TR');
+                const isOverdue = new Date(hw.dueDate) < new Date() && hw.status !== 'completed';
+                
+                return `
+                    <div class="homework-card ${hw.status === 'completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="homework-title">${hw.title}</div>
+                        <div class="homework-meta">
+                            <span>👤 ${studentName}</span>
+                            <span>📅 ${dueDate}</span>
+                        </div>
+                        <div class="homework-description">${hw.description}</div>
+                        <div style="font-size: 0.9em; color: var(--text-secondary);">
+                            Durum: ${hw.status === 'completed' ? '✅ Tamamlandı' : '⏳ Bekliyor'}
+                        </div>
+                    </div>
+                `;
+            }).join('')}</div>`;
+        }
+
+        async function loadStudentHomeworks() {
+            const homeworkRef = ref(database, 'homeworks');
+            onValue(homeworkRef, (snapshot) => {
+                const myHomework = [];
+                snapshot.forEach((child) => {
+                    const hw = { id: child.key, ...child.val() };
+                    if (hw.studentId === currentUser.uid) {
+                        myHomework.push(hw);
+                    }
+                });
+                displayStudentHomeworks(myHomework);
+            });
+        }
+
+        function displayStudentHomeworks(homeworkList) {
+            const container = document.getElementById('studentHomeworkList');
+            
+            if (homeworkList.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); text-align: center; padding: 40px;">Henüz ödeviniz yok.</p>';
+                return;
+            }
+
+            container.innerHTML = `<div class="homework-grid">${homeworkList.map(hw => {
+                const dueDate = new Date(hw.dueDate).toLocaleDateString('tr-TR');
+                const isOverdue = new Date(hw.dueDate) < new Date() && hw.status !== 'completed';
+                
+                return `
+                    <div class="homework-card ${hw.status === 'completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="homework-title">${hw.title}</div>
+                        <div class="homework-meta">
+                            <span>👨‍🏫 ${hw.teacherName}</span>
+                            <span>📅 ${dueDate}</span>
+                        </div>
+                        <div class="homework-description">${hw.description}</div>
+                        <div class="homework-actions">
+                            ${hw.status !== 'completed' ? 
+                                `<button class="btn btn-small btn-success" onclick="completeHomework('${hw.id}')">✅ Tamamlandı</button>` :
+                                '<span style="color: #10b981; font-weight: 600;">✅ Tamamlandı</span>'
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('')}</div>`;
+        }
+
+        window.completeHomework = async function(homeworkId) {
+            if (!confirm('Bu ödevi tamamlandı olarak işaretlemek istediğinize emin misiniz?')) {
+                return;
+            }
+
+            try {
+                await update(ref(database, `homeworks/${homeworkId}`), {
+                    status: 'completed',
+                    completedAt: new Date().toISOString()
+                });
+
+                const homeworkSnapshot = await get(ref(database, `homeworks/${homeworkId}`));
+                const homework = homeworkSnapshot.val();
+
+                // Öğretmene bildirim gönder
+                const notifRef = push(ref(database, `notifications/${homework.teacherId}`));
+                await set(notifRef, {
+                    type: 'homework_completed',
+                    studentName: currentUser.name,
+                    message: `${currentUser.name} "${homework.title}" ödevini tamamladı`,
+                    timestamp: Date.now(),
+                    read: false
+                });
+
+                alert('✅ Ödev tamamlandı olarak işaretlendi!');
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        };
+
+        // ========== MESAJLAŞMA ==========
+        async function loadTeacherMessages() {
+            const container = document.getElementById('teacherStudentSelect');
+            const trackingStudents = allStudents.filter(s => 
+                s.teachers && s.teachers.includes(currentUser.uid)
+            );
+
+            if (trackingStudents.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary);">Takip ettiğiniz öğrenci yok.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <label style="color: var(--text-primary); font-weight: 600; margin-bottom: 10px; display: block;">Öğrenci Seç</label>
+                <select onchange="selectMessageRecipient(this.value)" style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
+                    <option value="">Öğrenci seçin...</option>
+                    ${trackingStudents.map(s => `<option value="${s.id}">${s.name}</option>`).join('')}
+                </select>
+            `;
+        }
+
+        async function loadStudentMessages() {
+            const studentRef = ref(database, `students/${currentUser.uid}`);
+            const snapshot = await get(studentRef);
+            const studentData = snapshot.val();
+            
+            if (!studentData || !studentData.teachers || studentData.teachers.length === 0) {
+                document.getElementById('studentTeacherSelect').innerHTML = '<p style="color: var(--text-secondary);">Henüz öğretmen takibi yok.</p>';
+                return;
+            }
+
+            const teachers = [];
+            for (const teacherId of studentData.teachers) {
+                const teacherSnapshot = await get(ref(database, `users/${teacherId}`));
+                if (teacherSnapshot.exists()) {
+                    teachers.push({ id: teacherId, ...teacherSnapshot.val() });
+                }
+            }
+
+            document.getElementById('studentTeacherSelect').innerHTML = `
+                <label style="color: var(--text-primary); font-weight: 600; margin-bottom: 10px; display: block;">Öğretmen Seç</label>
+                <select onchange="selectMessageRecipient(this.value)" style="width: 100%; padding: 12px; border-radius: 10px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-primary);">
+                    <option value="">Öğretmen seçin...</option>
+                    ${teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('')}
+                </select>
+            `;
+        }
+
+        window.selectMessageRecipient = async function(recipientId) {
+            if (!recipientId) return;
+            selectedMessageRecipient = recipientId;
+            
+            const chatId = [currentUser.uid, recipientId].sort().join('_');
+            const messagesRef = ref(database, `messages/${chatId}`);
+            
+            onValue(messagesRef, (snapshot) => {
+                const chatMessages = [];
+                snapshot.forEach((child) => {
+                    chatMessages.push({ id: child.key, ...child.val() });
+                });
+                displayMessages(chatMessages, currentUser.userType === 'teacher' ? 'teacherMessagesContainer' : 'studentMessagesContainer');
+            });
+        };
+
+        function displayMessages(messagesList, containerId) {
+            const container = document.getElementById(containerId);
+            
+            if (messagesList.length === 0) {
+                container.innerHTML = `
+                    <div class="messages-container">
+                        <p style="color: var(--text-secondary); text-align: center; padding: 40px;">Henüz mesaj yok. İlk mesajı siz gönderin!</p>
+                    </div>
+                    <div class="input-group">
+                        <textarea id="${containerId === 'teacherMessagesContainer' ? 'teacherMessageText' : 'studentMessageText'}" rows="3" placeholder="Mesajınızı yazın..."></textarea>
+                    </div>
+                    <button class="btn btn-small" onclick="sendDirectMessage('${containerId}')">📨 Gönder</button>
+                `;
+                return;
+            }
+
+            const sorted = messagesList.sort((a, b) => a.timestamp - b.timestamp);
+            
+            container.innerHTML = `
+                <div class="messages-container">
+                    ${sorted.map(msg => {
+                        const isSent = msg.senderId === currentUser.uid;
+                        const time = new Date(msg.timestamp).toLocaleString('tr-TR');
+                        return `
+                            <div class="message-item ${isSent ? 'sent' : ''}">
+                                <div class="message-header">
+                                    <span class="message-sender">${msg.senderName}</span>
+                                    <span class="message-time">${time}</span>
+                                </div>
+                                <div class="message-body">${msg.message}</div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+                <div class="input-group">
+                    <textarea id="${containerId === 'teacherMessagesContainer' ? 'teacherMessageText' : 'studentMessageText'}" rows="3" placeholder="Mesajınızı yazın..."></textarea>
+                </div>
+                <button class="btn btn-small" onclick="sendDirectMessage('${containerId}')">📨 Gönder</button>
+            `;
+
+            // Scroll to bottom
+            const messagesContainer = container.querySelector('.messages-container');
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        window.sendDirectMessage = async function(containerId) {
+            if (!selectedMessageRecipient) {
+                alert('Lütfen önce bir alıcı seçin!');
+                return;
+            }
+
+            const textareaId = containerId === 'teacherMessagesContainer' ? 'teacherMessageText' : 'studentMessageText';
+            const messageText = document.getElementById(textareaId).value.trim();
+            
+            if (!messageText) {
+                alert('Lütfen bir mesaj yazın!');
+                return;
+            }
+
+            try {
+                const chatId = [currentUser.uid, selectedMessageRecipient].sort().join('_');
+                const messageRef = push(ref(database, `messages/${chatId}`));
+                
+                await set(messageRef, {
+                    senderId: currentUser.uid,
+                    senderName: currentUser.name,
+                    recipientId: selectedMessageRecipient,
+                    message: messageText,
+                    timestamp: Date.now()
+                });
+
+                // Alıcıya bildirim gönder
+                const notifRef = push(ref(database, `notifications/${selectedMessageRecipient}`));
+                await set(notifRef, {
+                    type: 'message',
+                    message: `${currentUser.name} size mesaj gönderdi`,
+                    timestamp: Date.now(),
+                    read: false
+                });
+
+                document.getElementById(textareaId).value = '';
+            } catch (error) {
+                alert('Hata: ' + error.message);
+            }
+        };
+
+        // ========== ÖĞRENCİ PANELİ ==========
         async function showStudentInterface() {
+            hideAllSections();
             document.getElementById('studentSection').classList.remove('hidden');
-            document.getElementById('teacherStudentList').classList.add('hidden');
-            document.getElementById('teacherNotifications').classList.add('hidden');
-            document.getElementById('teacherRecordsView').classList.add('hidden');
-            document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('studentCalendar').classList.remove('hidden');
+            document.getElementById('studentHomeworkSection').classList.remove('hidden');
+            document.getElementById('studentMessagesSection').classList.remove('hidden');
 
             const categoriesRef = ref(database, `categories/${currentUser.uid}`);
             onValue(categoriesRef, (snapshot) => {
@@ -1130,9 +2204,13 @@
             onValue(recordsRef, (snapshot) => {
                 records = snapshot.val() || [];
                 displayRecords();
+                generateCalendar();
             });
 
             document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
+            
+            loadStudentHomeworks();
+            loadStudentMessages();
         }
 
         function displayStudentsList() {
@@ -1196,7 +2274,7 @@
                 html += `
                     <div class="notification-item ${!notif.read ? 'unread' : ''}">
                         <div>
-                            <strong>${notif.studentName}</strong> yeni çalışma kaydı ekledi
+                            ${notif.studentName ? `<strong>${notif.studentName}</strong>` : ''} ${notif.message}
                             <br><small style="color: #6b7280;">${date}</small>
                         </div>
                         ${!notif.read ? `<button class="btn btn-small" onclick="markAsRead('${notif.id}')">✓</button>` : ''}
@@ -1394,7 +2472,7 @@
                     await set(notifRef, {
                         studentId: currentUser.uid,
                         studentName: currentUser.name,
-                        message: 'Yeni çalışma kaydı ekledi',
+                        message: 'yeni çalışma kaydı ekledi',
                         timestamp: Date.now(),
                         read: false
                     });
