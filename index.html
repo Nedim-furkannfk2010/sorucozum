@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="google-site-verification" content="8dUxTNjB478OD7_1HujNtgtCUB6wZMGR_TjglEpd0SU" />
-    <meta name="description" content="Çalışma Takip Sistemi - Öğrenci ve öğretmenler için çalışma takip platformu">
     <title>Çalışma Takip Sistemi</title>
     <style>
         * {
@@ -34,19 +33,6 @@
         .header h1 {
             font-size: 2.5em;
             margin-bottom: 10px;
-        }
-
-        .status-badge {
-            background: rgba(255,255,255,0.2);
-            backdrop-filter: blur(10px);
-            padding: 10px 20px;
-            border-radius: 20px;
-            display: inline-block;
-            margin-top: 10px;
-        }
-
-        .status-badge.connected {
-            background: rgba(34, 197, 94, 0.3);
         }
 
         .card {
@@ -136,11 +122,6 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
         .btn-small {
@@ -347,6 +328,19 @@
             font-weight: bold;
             margin-left: 10px;
         }
+
+        .status-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .status-badge.connected {
+            background: rgba(34, 197, 94, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -409,6 +403,7 @@
         <div class="container">
             <div class="header">
                 <h1>📚 Çalışma Takip Sistemi</h1>
+                <div class="status-badge connected">✅ Çevrimiçi</div>
                 <div class="user-info">
                     <span id="userDisplayName"></span>
                     <button class="btn btn-small btn-danger" onclick="logout()">Çıkış Yap</button>
@@ -483,9 +478,7 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
-            from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-        import { getDatabase, ref, set, get, onValue, push, update, remove } 
+        import { getDatabase, ref, set, get, onValue, push, update } 
             from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         const firebaseConfig = {
@@ -500,7 +493,6 @@
         };
 
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const database = getDatabase(app);
 
         let currentUser = null;
@@ -509,20 +501,14 @@
         let allStudents = [];
         let notifications = [];
 
-        // Auth State Observer
-        onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                const userRef = ref(database, `users/${user.uid}`);
-                const snapshot = await get(userRef);
-                
-                if (snapshot.exists()) {
-                    currentUser = { uid: user.uid, ...snapshot.val() };
-                    showMainScreen();
-                }
-            } else {
-                showAuthScreen();
+        // Sayfa yüklendiğinde oturum kontrolü
+        window.onload = function() {
+            const savedUser = localStorage.getItem('currentUser');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                showMainScreen();
             }
-        });
+        };
 
         window.switchAuthTab = function(tab) {
             const loginForm = document.getElementById('loginForm');
@@ -559,33 +545,49 @@
             }
 
             try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                const user = userCredential.user;
+                // E-posta kontrolü
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                const users = snapshot.val() || {};
+                
+                // E-posta zaten kayıtlı mı?
+                const existingUser = Object.values(users).find(u => u.email === email);
+                if (existingUser) {
+                    alert('Bu e-posta adresi zaten kayıtlı!');
+                    return;
+                }
 
-                await set(ref(database, `users/${user.uid}`), {
+                // Yeni kullanıcı ID'si oluştur
+                const userId = 'user_' + Date.now();
+
+                // Kullanıcıyı kaydet
+                await set(ref(database, `users/${userId}`), {
                     name: name,
                     email: email,
+                    password: password, // Gerçek projede hash'lenmiş olmalı
                     userType: userType,
                     createdAt: new Date().toISOString()
                 });
 
                 if (userType === 'student') {
-                    await set(ref(database, `students/${user.uid}`), {
+                    await set(ref(database, `students/${userId}`), {
                         name: name,
                         email: email,
                         teachers: []
                     });
-                    await set(ref(database, `categories/${user.uid}`), []);
-                    await set(ref(database, `records/${user.uid}`), []);
+                    await set(ref(database, `categories/${userId}`), []);
+                    await set(ref(database, `records/${userId}`), []);
                 } else {
-                    await set(ref(database, `teachers/${user.uid}`), {
+                    await set(ref(database, `teachers/${userId}`), {
                         name: name,
                         email: email,
                         students: []
                     });
                 }
 
-                alert('Kayıt başarılı! Giriş yapılıyor...');
+                alert('✅ Kayıt başarılı! Şimdi giriş yapabilirsiniz.');
+                switchAuthTab('login');
+                document.getElementById('loginEmail').value = email;
             } catch (error) {
                 alert('Hata: ' + error.message);
             }
@@ -601,22 +603,42 @@
             }
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
+                const users = snapshot.val() || {};
+                
+                // Kullanıcıyı bul
+                let foundUser = null;
+                let userId = null;
+                
+                for (const [id, user] of Object.entries(users)) {
+                    if (user.email === email && user.password === password) {
+                        foundUser = user;
+                        userId = id;
+                        break;
+                    }
+                }
+
+                if (!foundUser) {
+                    alert('E-posta veya şifre hatalı!');
+                    return;
+                }
+
+                currentUser = { uid: userId, ...foundUser };
+                localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                showMainScreen();
             } catch (error) {
                 alert('Giriş hatası: ' + error.message);
             }
         };
 
-        window.logout = async function() {
+        window.logout = function() {
             if (confirm('Çıkış yapmak istediğinize emin misiniz?')) {
-                await signOut(auth);
+                localStorage.removeItem('currentUser');
+                currentUser = null;
+                location.reload();
             }
         };
-
-        function showAuthScreen() {
-            document.getElementById('authScreen').classList.remove('hidden');
-            document.getElementById('mainScreen').classList.add('hidden');
-        }
 
         function showMainScreen() {
             document.getElementById('authScreen').classList.add('hidden');
@@ -639,15 +661,16 @@
             document.getElementById('teacherRecordsView').classList.remove('hidden');
             document.getElementById('studentSection').classList.add('hidden');
 
-            // Tüm öğrencileri getir
+            // Öğrencileri dinle
             const studentsRef = ref(database, 'students');
-            onValue(studentsRef, async (snapshot) => {
+            onValue(studentsRef, (snapshot) => {
                 const students = [];
                 snapshot.forEach((child) => {
                     students.push({ id: child.key, ...child.val() });
                 });
                 allStudents = students;
                 displayStudentsList();
+                displayTeacherRecords();
             });
 
             // Bildirimleri dinle
@@ -660,9 +683,6 @@
                 notifications = notifs.sort((a, b) => b.timestamp - a.timestamp);
                 displayNotifications();
             });
-
-            // Öğretmenin takip ettiği öğrencilerin kayıtlarını göster
-            displayTeacherRecords();
         }
 
         async function showStudentInterface() {
@@ -745,7 +765,7 @@
                     </h3>
             `;
 
-            notifications.forEach(notif => {
+            notifications.slice(0, 10).forEach(notif => {
                 const date = new Date(notif.timestamp).toLocaleString('tr-TR');
                 html += `
                     <div class="notification-item ${!notif.read ? 'unread' : ''}">
@@ -753,7 +773,7 @@
                             <strong>${notif.studentName}</strong> yeni çalışma kaydı ekledi
                             <br><small style="color: #6b7280;">${date}</small>
                         </div>
-                        <button class="btn btn-small" onclick="markAsRead('${notif.id}')">✓</button>
+                        ${!notif.read ? `<button class="btn btn-small" onclick="markAsRead('${notif.id}')">✓</button>` : ''}
                     </div>
                 `;
             });
@@ -771,7 +791,6 @@
         async function displayTeacherRecords() {
             const container = document.getElementById('teacherRecordsContainer');
             
-            // Takip edilen öğrencileri bul
             const trackingStudents = allStudents.filter(s => 
                 s.teachers && s.teachers.includes(currentUser.uid)
             );
@@ -807,14 +826,15 @@
                         </thead>
                         <tbody>`;
                     
-                    studentRecords.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)).forEach(record => {
+                    studentRecords.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)).slice(0, 5).forEach(record => {
                         const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
+                        const detailsStr = JSON.stringify(record).replace(/"/g, '&quot;');
                         html += `
                             <tr>
                                 <td><strong>${formattedDate}</strong></td>
                                 <td>${record.calismaSuresi || '-'}</td>
-                                <td>${record.notlar || '-'}</td>
-                                <td><button class="btn btn-small" onclick="showRecordDetails(${JSON.stringify(record).replace(/"/g, '&quot;')})">👁️ Detay</button></td>
+                                <td style="max-width: 200px;">${record.notlar || '-'}</td>
+                                <td><button class="btn btn-small" onclick='showRecordDetails(${detailsStr})'>👁️ Detay</button></td>
                             </tr>
                         `;
                     });
@@ -829,16 +849,18 @@
         }
 
         window.showRecordDetails = function(record) {
-            let details = `Tarih: ${new Date(record.tarih).toLocaleDateString('tr-TR')}\n`;
-            details += `Süre: ${record.calismaSuresi || 'Belirtilmemiş'}\n`;
-            details += `Notlar: ${record.notlar || 'Yok'}\n\n`;
-            details += 'Kategori Detayları:\n';
+            let details = `📅 Tarih: ${new Date(record.tarih).toLocaleDateString('tr-TR')}\n`;
+            details += `⏱️ Süre: ${record.calismaSuresi || 'Belirtilmemiş'}\n`;
+            details += `📝 Notlar: ${record.notlar || 'Yok'}\n\n`;
+            details += '━━━━━━━━━━━━━━━━━━━━\n';
+            details += '📊 Kategori Detayları:\n\n';
             
             for (const [category, data] of Object.entries(record.data || {})) {
-                details += `\n${category}:\n`;
-                details += `  Doğru: ${data.dogru}\n`;
-                details += `  Yanlış: ${data.yanlis}\n`;
-                if (data.not) details += `  Not: ${data.not}\n`;
+                details += `📌 ${category}:\n`;
+                details += `   ✅ Doğru: ${data.dogru}\n`;
+                details += `   ❌ Yanlış: ${data.yanlis}\n`;
+                if (data.not) details += `   📝 Not: ${data.not}\n`;
+                details += '\n';
             }
             
             alert(details);
@@ -939,7 +961,7 @@
             const snapshot = await get(studentRef);
             const studentData = snapshot.val();
             
-            if (studentData && studentData.teachers) {
+            if (studentData && studentData.teachers && studentData.teachers.length > 0) {
                 for (const teacherId of studentData.teachers) {
                     const notifRef = push(ref(database, `notifications/${teacherId}`));
                     await set(notifRef, {
@@ -954,11 +976,12 @@
 
             // Formu temizle
             categories.forEach(category => {
-                if (document.getElementById('input_dogru_' + category)) {
-                    document.getElementById('input_dogru_' + category).value = '';
-                    document.getElementById('input_yanlis_' + category).value = '';
-                    document.getElementById('input_not_' + category).value = '';
-                }
+                const dogruInput = document.getElementById('input_dogru_' + category);
+                const yanlisInput = document.getElementById('input_yanlis_' + category);
+                const notInput = document.getElementById('input_not_' + category);
+                if (dogruInput) dogruInput.value = '';
+                if (yanlisInput) yanlisInput.value = '';
+                if (notInput) notInput.value = '';
             });
             document.getElementById('calismaSaati').value = '';
             document.getElementById('calismaDakika').value = '';
@@ -1041,7 +1064,7 @@
                         ${categories.map(cat => {
                             if (record.data && record.data[cat]) {
                                 const d = record.data[cat];
-                                return `<td><div>✅ ${d.dogru} ❌ ${d.yanlis}${d.not ? '<br><small>' + d.not + '</small>' : ''}</div></td>`;
+                                return `<td><div style="font-size: 0.9em;">✅ ${d.dogru} ❌ ${d.yanlis}${d.not ? '<br><small style="color: #6b7280;">' + d.not + '</small>' : ''}</div></td>`;
                             }
                             return `<td>-</td>`;
                         }).join('')}
