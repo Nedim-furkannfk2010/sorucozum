@@ -34,6 +34,23 @@
             margin-bottom: 10px;
         }
 
+        .status-badge {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .status-badge.connected {
+            background: rgba(34, 197, 94, 0.3);
+        }
+
+        .status-badge.loading {
+            background: rgba(251, 191, 36, 0.3);
+        }
+
         .card {
             background: white;
             border-radius: 20px;
@@ -89,6 +106,11 @@
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .btn-small {
@@ -305,6 +327,9 @@
         <div class="header">
             <h1>📚 Çalışma Takip Sistemi</h1>
             <p>Kendi kategorilerini oluştur ve çalışmalarını detaylı takip et</p>
+            <div class="status-badge loading" id="statusBadge">
+                🔄 Bağlanılıyor...
+            </div>
         </div>
 
         <div class="card">
@@ -362,35 +387,60 @@
         </div>
     </div>
 
-    <script>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getDatabase, ref, set, get, remove, onValue } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
+
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCmNvROhMpIDl01F3lpYwYKse8AGFfYTlY",
+            authDomain: "calismatakip-c7cf9.firebaseapp.com",
+            databaseURL: "https://calismatakip-c7cf9-default-rtdb.firebaseio.com",
+            projectId: "calismatakip-c7cf9",
+            storageBucket: "calismatakip-c7cf9.firebasestorage.app",
+            messagingSenderId: "307753726658",
+            appId: "1:307753726658:web:53856ee5fabf88d7dc415b",
+            measurementId: "G-2PJF0SKPN0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
         let categories = [];
         let records = [];
 
-        window.onload = function() {
-            document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
-            loadData();
-        };
+        // Firebase'den verileri dinle
+        const categoriesRef = ref(database, 'categories');
+        const recordsRef = ref(database, 'records');
 
-        function loadData() {
-            const savedCategories = localStorage.getItem('categories');
-            const savedRecords = localStorage.getItem('studyRecords');
-            
-            if (savedCategories) {
-                categories = JSON.parse(savedCategories);
-            }
-            if (savedRecords) {
-                records = JSON.parse(savedRecords);
-            }
-            
+        onValue(categoriesRef, (snapshot) => {
+            const data = snapshot.val();
+            categories = data || [];
             updateDisplay();
+            updateStatus(true);
+        });
+
+        onValue(recordsRef, (snapshot) => {
+            const data = snapshot.val();
+            records = data || [];
+            updateDisplay();
+        });
+
+        function updateStatus(connected) {
+            const badge = document.getElementById('statusBadge');
+            if (connected) {
+                badge.className = 'status-badge connected';
+                badge.textContent = '✅ Firebase\'e bağlı';
+            } else {
+                badge.className = 'status-badge loading';
+                badge.textContent = '🔄 Bağlanılıyor...';
+            }
         }
 
-        function saveData() {
-            localStorage.setItem('categories', JSON.stringify(categories));
-            localStorage.setItem('studyRecords', JSON.stringify(records));
-        }
-
-        function addCategory() {
+        // Global fonksiyonlar
+        window.addCategory = async function() {
             const input = document.getElementById('newCategory');
             const categoryName = input.value.trim();
             
@@ -405,26 +455,24 @@
             }
 
             categories.push(categoryName);
+            await set(categoriesRef, categories);
             input.value = '';
-            saveData();
-            updateDisplay();
-        }
+        };
 
-        function removeCategory(categoryName) {
-            if (confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu kategoriye ait tüm veriler kayıtlardan kaldırılacak.`)) {
+        window.removeCategory = async function(categoryName) {
+            if (confirm(`"${categoryName}" kategorisini silmek istediğinize emin misiniz?`)) {
                 categories = categories.filter(c => c !== categoryName);
-                
                 records = records.map(record => {
                     delete record.data[categoryName];
                     return record;
                 });
                 
-                saveData();
-                updateDisplay();
+                await set(categoriesRef, categories);
+                await set(recordsRef, records);
             }
-        }
+        };
 
-        function addRecord() {
+        window.addRecord = async function() {
             const tarih = document.getElementById('tarih').value;
             const calismaSaati = document.getElementById('calismaSaati').value;
             const calismaDakika = document.getElementById('calismaDakika').value;
@@ -444,9 +492,9 @@
             let hasValue = false;
 
             categories.forEach(category => {
-                const dogru = document.getElementById('input_dogru_' + category).value.trim();
-                const yanlis = document.getElementById('input_yanlis_' + category).value.trim();
-                const not = document.getElementById('input_not_' + category).value.trim();
+                const dogru = document.getElementById('input_dogru_' + category)?.value.trim() || '';
+                const yanlis = document.getElementById('input_yanlis_' + category)?.value.trim() || '';
+                const not = document.getElementById('input_not_' + category)?.value.trim() || '';
                 
                 if (dogru || yanlis || not) {
                     data[category] = {
@@ -463,7 +511,6 @@
                 return;
             }
 
-            // Süreyi formatla
             let calismaSuresi = '';
             if (calismaSaati || calismaDakika) {
                 const saat = parseInt(calismaSaati) || 0;
@@ -485,30 +532,30 @@
                 data: data
             });
 
-            saveData();
-            updateDisplay();
+            await set(recordsRef, records);
 
             // Formu temizle
             categories.forEach(category => {
-                document.getElementById('input_dogru_' + category).value = '';
-                document.getElementById('input_yanlis_' + category).value = '';
-                document.getElementById('input_not_' + category).value = '';
+                if (document.getElementById('input_dogru_' + category)) {
+                    document.getElementById('input_dogru_' + category).value = '';
+                    document.getElementById('input_yanlis_' + category).value = '';
+                    document.getElementById('input_not_' + category).value = '';
+                }
             });
             document.getElementById('calismaSaati').value = '';
             document.getElementById('calismaDakika').value = '';
             document.getElementById('notlar').value = '';
             document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
-        }
+        };
 
-        function deleteRecord(id) {
+        window.deleteRecord = async function(id) {
             if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
                 records = records.filter(r => r.id !== id);
-                saveData();
-                updateDisplay();
+                await set(recordsRef, records);
             }
-        }
+        };
 
-        function exportData(period) {
+        window.exportData = function(period) {
             const now = new Date();
             let filteredRecords = [];
 
@@ -530,8 +577,7 @@
                 return;
             }
 
-            // CSV formatında oluştur
-            let csv = 'Tarih,Çalışma Süresi (Saat),Genel Notlar';
+            let csv = 'Tarih,Çalışma Süresi,Genel Notlar';
             categories.forEach(cat => {
                 csv += `,${cat} (Doğru),${cat} (Yanlış),${cat} (Not)`;
             });
@@ -551,7 +597,6 @@
                 csv += row.join(',') + '\n';
             });
 
-            // İndir
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
             const url = URL.createObjectURL(blob);
@@ -569,7 +614,7 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
+        };
 
         function updateDisplay() {
             displayCategories();
@@ -652,7 +697,7 @@
                         <thead>
                             <tr>
                                 <th>Tarih</th>
-                                <th>Süre (Saat)</th>
+                                <th>Süre</th>
                                 <th>Genel Notlar</th>
                                 ${categories.map(cat => `<th>${cat}</th>`).join('')}
                                 <th>İşlem</th>
@@ -674,7 +719,7 @@
                         <td>${record.calismaSuresi || '-'}</td>
                         <td style="max-width: 200px; white-space: pre-wrap;">${record.notlar || '-'}</td>
                         ${categories.map(cat => {
-                            if (record.data[cat]) {
+                            if (record.data && record.data[cat]) {
                                 const d = record.data[cat];
                                 let result = `<div style="font-size: 0.9em;">`;
                                 if (d.dogru !== '0' || d.yanlis !== '0') {
@@ -703,6 +748,11 @@
 
             container.innerHTML = html;
         }
+
+        // Sayfa yüklendiğinde tarihi ayarla
+        window.onload = function() {
+            document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
+        };
     </script>
 </body>
 </html>
