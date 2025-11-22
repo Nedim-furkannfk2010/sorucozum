@@ -88,10 +88,20 @@
             transition: all 0.3s ease;
         }
 
+        .card.compact {
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
         .card h2 {
             color: var(--text-primary);
             margin-bottom: 20px;
             font-size: 1.8em;
+        }
+
+        .card.compact h2 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
         }
 
         .auth-container {
@@ -128,11 +138,16 @@
             margin-bottom: 20px;
         }
 
+        .input-group.compact {
+            margin-bottom: 15px;
+        }
+
         .input-group label {
             display: block;
             color: var(--text-primary);
             font-weight: 600;
             margin-bottom: 8px;
+            font-size: 0.95em;
         }
 
         .input-group input, .input-group select, .input-group textarea {
@@ -145,6 +160,13 @@
             font-family: inherit;
             background: var(--card-bg);
             color: var(--text-primary);
+        }
+
+        .input-group.compact input, 
+        .input-group.compact select, 
+        .input-group.compact textarea {
+            padding: 10px;
+            font-size: 0.95em;
         }
 
         .input-group input:focus, .input-group select:focus, .input-group textarea:focus {
@@ -296,8 +318,8 @@
         }
 
         .categories-section {
-            margin-bottom: 30px;
-            padding: 20px;
+            margin-bottom: 20px;
+            padding: 15px;
             background: #f3f4f6;
             border-radius: 15px;
         }
@@ -413,6 +435,11 @@
         .badge-student {
             background: #d1fae5;
             color: #065f46;
+        }
+
+        .badge-parent {
+            background: #fce7f3;
+            color: #9f1239;
         }
 
         .badge-admin {
@@ -865,6 +892,39 @@
             font-size: 1.3em;
         }
 
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateX(-5px);
+        }
+
+        /* Compact grid layout for student */
+        .compact-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 968px) {
+            .compact-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .profile-container {
                 grid-template-columns: 1fr;
@@ -888,7 +948,7 @@
     <div id="authScreen">
         <div class="header">
             <h1>📚 Çalışma Takip Sistemi</h1>
-            <p>Öğrenci ve öğretmenler için gelişmiş takip platformu</p>
+            <p>Öğrenci, öğretmen ve veliler için gelişmiş takip platformu</p>
         </div>
 
         <div class="auth-container">
@@ -930,6 +990,7 @@
                         <select id="registerUserType">
                             <option value="student">🎓 Öğrenci</option>
                             <option value="teacher">👨‍🏫 Öğretmen</option>
+                            <option value="parent">👨‍👩‍👧 Veli</option>
                         </select>
                     </div>
                     <button class="btn" onclick="register()">Kayıt Ol</button>
@@ -942,6 +1003,7 @@
     <div id="mainScreen" class="hidden">
         <div class="container">
             <div class="header">
+                <button class="back-button hidden" id="backButton" onclick="backToMain()">← Geri Dön</button>
                 <h1>📚 Çalışma Takip Sistemi</h1>
                 <div class="status-badge connected">✅ Çevrimiçi</div>
                 <div class="user-info">
@@ -1020,6 +1082,10 @@
                         <h3 id="totalTeachersCount">0</h3>
                         <p>Öğretmen</p>
                     </div>
+                    <div class="admin-stat-card" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
+                        <h3 id="totalParentsCount">0</h3>
+                        <p>Veli</p>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -1042,6 +1108,17 @@
                         </table>
                     </div>
                 </div>
+            </div>
+
+            <!-- Veli Paneli -->
+            <div id="parentPanel" class="hidden">
+                <div id="parentNotifications" class="hidden"></div>
+                <div id="parentStudentList" class="card">
+                    <h2>👨‍👩‍👧 Çocuklarım</h2>
+                    <p style="color: var(--text-secondary); margin-bottom: 20px;">Soyadınızla eşleşen öğrencileri takip edebilirsiniz</p>
+                    <div id="parentStudentsGrid" class="students-grid"></div>
+                </div>
+                <div id="parentRecordsView" class="hidden"></div>
             </div>
 
             <!-- Öğretmen Bildirimleri -->
@@ -1078,7 +1155,7 @@
 
             <!-- Öğrenci - Takvim -->
             <div id="studentCalendar" class="hidden">
-                <div class="card calendar-container">
+                <div class="card calendar-container compact">
                     <h2>📅 Çalışma Takvimi</h2>
                     <p style="color: var(--text-secondary); margin-bottom: 10px;">Son 365 günlük çalışma aktiviteniz</p>
                     <div class="calendar-grid" id="calendarGrid"></div>
@@ -1096,7 +1173,7 @@
 
             <!-- Öğrenci - Ödevler -->
             <div id="studentHomeworkSection" class="hidden">
-                <div class="card">
+                <div class="card compact">
                     <h2>📝 Ödevlerim</h2>
                     <div id="studentHomeworkList"></div>
                 </div>
@@ -1104,7 +1181,7 @@
 
             <!-- Öğrenci - Mesajlaşma -->
             <div id="studentMessagesSection" class="hidden">
-                <div class="card">
+                <div class="card compact">
                     <h2>💬 Öğretmenlerimle Mesajlaşma</h2>
                     <div id="studentTeacherSelect" style="margin-bottom: 20px;"></div>
                     <div id="studentMessagesContainer"></div>
@@ -1113,45 +1190,49 @@
 
             <!-- Öğrenci - Kategoriler ve Kayıt -->
             <div id="studentSection" class="hidden">
-                <div class="card">
-                    <h2>🏷️ Kategorileri Yönet</h2>
-                    <div class="categories-section">
-                        <div class="category-input-group">
-                            <input type="text" id="newCategory" placeholder="Kategori adı (örn: Matematik, Fizik)">
-                            <button class="btn btn-small" onclick="addCategory()">➕ Ekle</button>
-                        </div>
-                        <div class="categories-list" id="categoriesList"></div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h2>➕ Yeni Çalışma Kaydı</h2>
-                    <div style="display: grid; grid-template-columns: 200px 200px; gap: 15px; margin-bottom: 20px;">
-                        <div class="input-group">
-                            <label>📅 Tarih</label>
-                            <input type="date" id="tarih">
-                        </div>
-                        <div class="input-group">
-                            <label>⏱️ Çalışma Süresi</label>
-                            <div style="display: flex; gap: 10px;">
-                                <input type="number" id="calismaSaati" placeholder="Saat" min="0" style="flex: 1;">
-                                <input type="number" id="calismaDakika" placeholder="Dakika" min="0" max="59" style="flex: 1;">
+                <div class="compact-grid">
+                    <!-- Sol Kolon -->
+                    <div>
+                        <div class="card compact">
+                            <h2>🏷️ Kategorileri Yönet</h2>
+                            <div class="categories-section">
+                                <div class="category-input-group">
+                                    <input type="text" id="newCategory" placeholder="Kategori adı">
+                                    <button class="btn btn-small" onclick="addCategory()">➕ Ekle</button>
+                                </div>
+                                <div class="categories-list" id="categoriesList"></div>
                             </div>
                         </div>
-                    </div>
-                    
-                    <div class="input-group" style="margin-bottom: 20px;">
-                        <label>📝 Genel Notlar</label>
-                        <textarea id="notlar" placeholder="Bugün neler yaptınız..." rows="3"></textarea>
+
+                        <div class="card compact">
+                            <h2>➕ Yeni Çalışma Kaydı</h2>
+                            <div class="input-group compact">
+                                <label>📅 Tarih</label>
+                                <input type="date" id="tarih">
+                            </div>
+                            <div class="input-group compact">
+                                <label>⏱️ Çalışma Süresi</label>
+                                <div style="display: flex; gap: 10px;">
+                                    <input type="number" id="calismaSaati" placeholder="Saat" min="0" style="flex: 1;">
+                                    <input type="number" id="calismaDakika" placeholder="Dakika" min="0" max="59" style="flex: 1;">
+                                </div>
+                            </div>
+                            <div class="input-group compact">
+                                <label>📝 Genel Notlar</label>
+                                <textarea id="notlar" placeholder="Bugün neler yaptınız..." rows="2"></textarea>
+                            </div>
+                            <div id="dynamicInputs" style="margin-bottom: 15px;"></div>
+                            <button class="btn" onclick="addRecord()">💾 Kaydet</button>
+                        </div>
                     </div>
 
-                    <div id="dynamicInputs" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px;"></div>
-                    <button class="btn" onclick="addRecord()" style="margin-top: 20px;">💾 Kaydet ve Öğretmenlere Bildir</button>
-                </div>
-
-                <div class="card">
-                    <h2>📊 Kayıtlarım</h2>
-                    <div id="recordsContainer"></div>
+                    <!-- Sağ Kolon -->
+                    <div>
+                        <div class="card compact">
+                            <h2>📊 Kayıtlarım</h2>
+                            <div id="recordsContainer"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1189,6 +1270,7 @@
                 <select id="modalUserType">
                     <option value="student">🎓 Öğrenci</option>
                     <option value="teacher">👨‍🏫 Öğretmen</option>
+                    <option value="parent">👨‍👩‍👧 Veli</option>
                 </select>
             </div>
             <button class="btn" onclick="saveUser()">💾 Kaydet</button>
@@ -1222,21 +1304,6 @@
                 <small style="color: var(--text-secondary);">Ctrl/Cmd tuşu ile birden fazla seçebilirsiniz</small>
             </div>
             <button class="btn" onclick="saveHomework()">📤 Ödev Oluştur</button>
-        </div>
-    </div>
-
-    <!-- Mesaj Gönderme Modal -->
-    <div id="messageModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3>💬 Mesaj Gönder</h3>
-                <button class="close-modal" onclick="closeMessageModal()">✕</button>
-            </div>
-            <div class="messages-container" id="modalMessagesContainer"></div>
-            <div class="input-group">
-                <textarea id="messageText" rows="3" placeholder="Mesajınızı yazın..."></textarea>
-            </div>
-            <button class="btn" onclick="sendMessage()">📨 Gönder</button>
         </div>
     </div>
 
@@ -1356,12 +1423,19 @@
                     await set(ref(database, `students/${userId}`), {
                         name: name,
                         email: email,
-                        teachers: []
+                        teachers: [],
+                        parents: []
                     });
                     await set(ref(database, `categories/${userId}`), []);
                     await set(ref(database, `records/${userId}`), []);
-                } else {
+                } else if (userType === 'teacher') {
                     await set(ref(database, `teachers/${userId}`), {
+                        name: name,
+                        email: email,
+                        students: []
+                    });
+                } else if (userType === 'parent') {
+                    await set(ref(database, `parents/${userId}`), {
                         name: name,
                         email: email,
                         students: []
@@ -1440,10 +1514,15 @@
             
             if (currentUser.userType === 'admin') {
                 showAdminPanel();
+            } else if (currentUser.userType === 'parent') {
+                showParentInterface();
             } else {
-                const userType = currentUser.userType === 'teacher' ? '👨‍🏫 Öğretmen' : '🎓 Öğrenci';
+                const badges = {
+                    teacher: '<span class="badge badge-teacher">👨‍🏫 Öğretmen</span>',
+                    student: '<span class="badge badge-student">🎓 Öğrenci</span>'
+                };
                 document.getElementById('userDisplayName').innerHTML = 
-                    `${currentUser.name} <span class="badge ${currentUser.userType === 'teacher' ? 'badge-teacher' : 'badge-student'}">${userType}</span>`;
+                    `${currentUser.name} ${badges[currentUser.userType] || ''}`;
 
                 if (currentUser.userType === 'teacher') {
                     showTeacherInterface();
@@ -1453,11 +1532,26 @@
             }
         }
 
+        // ========== GERİ DÖN BUTONU ==========
+        window.backToMain = function() {
+            hideAllSections();
+            document.getElementById('backButton').classList.add('hidden');
+            
+            if (currentUser.userType === 'admin') {
+                showAdminPanel();
+            } else if (currentUser.userType === 'parent') {
+                showParentInterface();
+            } else if (currentUser.userType === 'teacher') {
+                showTeacherInterface();
+            } else {
+                showStudentInterface();
+            }
+        };
+
         // ========== PROFIL ==========
         window.showProfile = function() {
-            // Tüm bölümleri gizle
             hideAllSections();
-            
+            document.getElementById('backButton').classList.remove('hidden');
             document.getElementById('profileSection').classList.remove('hidden');
             loadProfile();
         };
@@ -1465,6 +1559,7 @@
         function hideAllSections() {
             document.getElementById('profileSection').classList.add('hidden');
             document.getElementById('adminPanel').classList.add('hidden');
+            document.getElementById('parentPanel').classList.add('hidden');
             document.getElementById('teacherNotifications').classList.add('hidden');
             document.getElementById('teacherHomeworkSection').classList.add('hidden');
             document.getElementById('teacherMessagesSection').classList.add('hidden');
@@ -1499,7 +1594,6 @@
                 
                 document.getElementById('totalRecords').textContent = userRecords.length;
                 
-                // Toplam çalışma süresi hesapla
                 let totalMinutes = 0;
                 userRecords.forEach(record => {
                     if (record.calismaSuresi) {
@@ -1519,7 +1613,6 @@
                 const hours = Math.floor(totalMinutes / 60);
                 document.getElementById('totalStudyTime').textContent = `${hours} saat`;
 
-                // Tamamlanan ödevler
                 const homeworkRef = ref(database, 'homeworks');
                 const hwSnapshot = await get(homeworkRef);
                 const allHomework = hwSnapshot.val() || {};
@@ -1593,6 +1686,7 @@
                 `${currentUser.name} <span class="badge badge-admin">👑 Admin</span>`;
             
             document.getElementById('profileBtn').classList.add('hidden');
+            document.getElementById('backButton').classList.add('hidden');
             hideAllSections();
             document.getElementById('adminPanel').classList.remove('hidden');
 
@@ -1612,10 +1706,12 @@
             const users = Object.values(allUsers);
             const students = users.filter(u => u.userType === 'student');
             const teachers = users.filter(u => u.userType === 'teacher');
+            const parents = users.filter(u => u.userType === 'parent');
 
             document.getElementById('totalUsersCount').textContent = users.length;
             document.getElementById('totalStudentsCount').textContent = students.length;
             document.getElementById('totalTeachersCount').textContent = teachers.length;
+            document.getElementById('totalParentsCount').textContent = parents.length;
         }
 
         function displayAllUsers() {
@@ -1628,10 +1724,12 @@
             }
 
             tbody.innerHTML = users.map(([userId, user]) => {
-                const userTypeBadge = user.userType === 'student' 
-                    ? '<span class="badge badge-student">🎓 Öğrenci</span>' 
-                    : '<span class="badge badge-teacher">👨‍🏫 Öğretmen</span>';
-                
+                const badges = {
+                    student: '<span class="badge badge-student">🎓 Öğrenci</span>',
+                    teacher: '<span class="badge badge-teacher">👨‍🏫 Öğretmen</span>',
+                    parent: '<span class="badge badge-parent">👨‍👩‍👧 Veli</span>'
+                };
+                const userTypeBadge = badges[user.userType] || '';
                 const createdDate = new Date(user.createdAt).toLocaleDateString('tr-TR');
 
                 return `
@@ -1723,7 +1821,8 @@
                     await set(ref(database, `students/${userId}`), {
                         name: name,
                         email: email,
-                        teachers: []
+                        teachers: [],
+                        parents: []
                     });
                     
                     const categoriesSnapshot = await get(ref(database, `categories/${userId}`));
@@ -1735,8 +1834,14 @@
                     if (!recordsSnapshot.exists()) {
                         await set(ref(database, `records/${userId}`), []);
                     }
-                } else {
+                } else if (userType === 'teacher') {
                     await set(ref(database, `teachers/${userId}`), {
+                        name: name,
+                        email: email,
+                        students: []
+                    });
+                } else if (userType === 'parent') {
+                    await set(ref(database, `parents/${userId}`), {
                         name: name,
                         email: email,
                         students: []
@@ -1759,6 +1864,7 @@
                 await remove(ref(database, `users/${userId}`));
                 await remove(ref(database, `students/${userId}`));
                 await remove(ref(database, `teachers/${userId}`));
+                await remove(ref(database, `parents/${userId}`));
                 await remove(ref(database, `categories/${userId}`));
                 await remove(ref(database, `records/${userId}`));
                 await remove(ref(database, `notifications/${userId}`));
@@ -1769,9 +1875,190 @@
             }
         };
 
+        // ========== VELİ PANELİ ==========
+        async function showParentInterface() {
+            document.getElementById('userDisplayName').innerHTML = 
+                `${currentUser.name} <span class="badge badge-parent">👨‍👩‍👧 Veli</span>`;
+            
+            hideAllSections();
+            document.getElementById('backButton').classList.add('hidden');
+            document.getElementById('parentPanel').classList.remove('hidden');
+
+            // Soyadı çıkar
+            const lastName = currentUser.name.split(' ').pop();
+
+            // Tüm öğrencileri yükle
+            const studentsRef = ref(database, 'students');
+            onValue(studentsRef, async (snapshot) => {
+                const students = [];
+                snapshot.forEach((child) => {
+                    const studentData = { id: child.key, ...child.val() };
+                    // Soyad eşleşmesi kontrolü
+                    const studentLastName = studentData.name.split(' ').pop();
+                    if (studentLastName.toLowerCase() === lastName.toLowerCase()) {
+                        students.push(studentData);
+                    }
+                });
+                allStudents = students;
+                displayParentStudents();
+            });
+
+            // Veli bildirimleri
+            const notificationsRef = ref(database, `notifications/${currentUser.uid}`);
+            onValue(notificationsRef, (snapshot) => {
+                const notifs = [];
+                snapshot.forEach((child) => {
+                    notifs.push({ id: child.key, ...child.val() });
+                });
+                notifications = notifs.sort((a, b) => b.timestamp - a.timestamp);
+                displayParentNotifications();
+            });
+
+            displayParentRecords();
+        }
+
+        function displayParentStudents() {
+            const container = document.getElementById('parentStudentsGrid');
+            
+            if (allStudents.length === 0) {
+                container.innerHTML = '<p style="color: #9ca3af; grid-column: 1/-1; text-align: center;">Soyadınızla eşleşen öğrenci bulunamadı.</p>';
+                return;
+            }
+
+            container.innerHTML = allStudents.map(student => {
+                const isTracking = student.parents && student.parents.includes(currentUser.uid);
+                return `
+                    <div class="student-card ${isTracking ? 'tracking' : ''}">
+                        <h3>🎓 ${student.name}</h3>
+                        <p>${student.email}</p>
+                        <button class="btn btn-small ${isTracking ? 'btn-danger' : 'btn-success'}" 
+                                onclick="toggleParentTracking('${student.id}', ${isTracking})">
+                            ${isTracking ? '❌ Takibi Bırak' : '✅ Takip Et'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        window.toggleParentTracking = async function(studentId, isCurrentlyTracking) {
+            const studentRef = ref(database, `students/${studentId}/parents`);
+            const snapshot = await get(studentRef);
+            let parents = snapshot.val() || [];
+
+            if (isCurrentlyTracking) {
+                parents = parents.filter(p => p !== currentUser.uid);
+            } else {
+                if (!parents.includes(currentUser.uid)) {
+                    parents.push(currentUser.uid);
+                }
+            }
+
+            await set(studentRef, parents);
+        };
+
+        function displayParentNotifications() {
+            const container = document.getElementById('parentNotifications');
+            const unreadCount = notifications.filter(n => !n.read).length;
+
+            if (notifications.length === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            let html = `
+                <div class="notifications-panel">
+                    <h3 style="color: #b45309; margin-bottom: 15px;">
+                        🔔 Bildirimler
+                        ${unreadCount > 0 ? `<span class="notification-badge">${unreadCount}</span>` : ''}
+                    </h3>
+            `;
+
+            notifications.slice(0, 10).forEach(notif => {
+                const date = new Date(notif.timestamp).toLocaleString('tr-TR');
+                html += `
+                    <div class="notification-item ${!notif.read ? 'unread' : ''}">
+                        <div>
+                            ${notif.studentName ? `<strong>${notif.studentName}</strong>` : ''} ${notif.message}
+                            <br><small style="color: #6b7280;">${date}</small>
+                        </div>
+                        ${!notif.read ? `<button class="btn btn-small" onclick="markAsRead('${notif.id}')">✓</button>` : ''}
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        async function displayParentRecords() {
+            const container = document.getElementById('parentRecordsView');
+            
+            const trackingStudents = allStudents.filter(s => 
+                s.parents && s.parents.includes(currentUser.uid)
+            );
+
+            if (trackingStudents.length === 0) {
+                container.innerHTML = '';
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            let html = '<div class="card"><h2>📊 Çocuklarımın Kayıtları</h2>';
+
+            for (const student of trackingStudents) {
+                const recordsRef = ref(database, `records/${student.id}`);
+                const snapshot = await get(recordsRef);
+                const studentRecords = snapshot.val() || [];
+                
+                html += `
+                    <div style="margin-bottom: 30px; padding: 20px; background: #f9fafb; border-radius: 15px;">
+                        <h3 style="color: #1f2937; margin-bottom: 15px;">🎓 ${student.name}</h3>
+                `;
+
+                if (studentRecords.length === 0) {
+                    html += '<p style="color: #9ca3af;">Henüz kayıt yok.</p>';
+                } else {
+                    html += `<div class="records-table"><table>
+                        <thead>
+                            <tr>
+                                <th>Tarih</th>
+                                <th>Süre</th>
+                                <th>Notlar</th>
+                                <th>Detaylar</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    
+                    studentRecords.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)).slice(0, 5).forEach(record => {
+                        const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
+                        const detailsStr = JSON.stringify(record).replace(/"/g, '&quot;');
+                        html += `
+                            <tr>
+                                <td><strong>${formattedDate}</strong></td>
+                                <td>${record.calismaSuresi || '-'}</td>
+                                <td style="max-width: 200px;">${record.notlar || '-'}</td>
+                                <td><button class="btn btn-small" onclick='showRecordDetails(${detailsStr})'>👁️ Detay</button></td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += `</tbody></table></div>`;
+                }
+
+                html += `</div>`;
+            }
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
         // ========== ÖĞRETMEN PANELİ ==========
         async function showTeacherInterface() {
             hideAllSections();
+            document.getElementById('backButton').classList.add('hidden');
             document.getElementById('teacherStudentList').classList.remove('hidden');
             document.getElementById('teacherNotifications').classList.remove('hidden');
             document.getElementById('teacherRecordsView').classList.remove('hidden');
@@ -1808,18 +2095,15 @@
             const today = new Date();
             const cells = [];
             
-            // Son 365 gün için hücreler oluştur
             for (let i = 364; i >= 0; i--) {
                 const date = new Date(today);
                 date.setDate(date.getDate() - i);
                 const dateStr = date.toISOString().split('T')[0];
                 
-                // O gün çalışma var mı kontrol et
                 const dayRecords = records.filter(r => r.tarih === dateStr);
                 let level = 0;
                 
                 if (dayRecords.length > 0) {
-                    // Çalışma süresine göre seviye belirle
                     let totalMinutes = 0;
                     dayRecords.forEach(record => {
                         if (record.calismaSuresi) {
@@ -1856,7 +2140,6 @@
             document.getElementById('homeworkDescription').value = '';
             document.getElementById('homeworkDueDate').value = '';
             
-            // Takip edilen öğrencileri listele
             const select = document.getElementById('homeworkStudentSelect');
             const trackingStudents = allStudents.filter(s => 
                 s.teachers && s.teachers.includes(currentUser.uid)
@@ -1899,7 +2182,6 @@
                         createdAt: new Date().toISOString()
                     });
 
-                    // Öğrenciye bildirim gönder
                     const notifRef = push(ref(database, `notifications/${studentId}`));
                     await set(notifRef, {
                         type: 'homework',
@@ -2019,7 +2301,6 @@
                 const homeworkSnapshot = await get(ref(database, `homeworks/${homeworkId}`));
                 const homework = homeworkSnapshot.val();
 
-                // Öğretmene bildirim gönder
                 const notifRef = push(ref(database, `notifications/${homework.teacherId}`));
                 await set(notifRef, {
                     type: 'homework_completed',
@@ -2139,7 +2420,6 @@
                 <button class="btn btn-small" onclick="sendDirectMessage('${containerId}')">📨 Gönder</button>
             `;
 
-            // Scroll to bottom
             const messagesContainer = container.querySelector('.messages-container');
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
@@ -2170,7 +2450,6 @@
                     timestamp: Date.now()
                 });
 
-                // Alıcıya bildirim gönder
                 const notifRef = push(ref(database, `notifications/${selectedMessageRecipient}`));
                 await set(notifRef, {
                     type: 'message',
@@ -2188,6 +2467,7 @@
         // ========== ÖĞRENCİ PANELİ ==========
         async function showStudentInterface() {
             hideAllSections();
+            document.getElementById('backButton').classList.add('hidden');
             document.getElementById('studentSection').classList.remove('hidden');
             document.getElementById('studentCalendar').classList.remove('hidden');
             document.getElementById('studentHomeworkSection').classList.remove('hidden');
@@ -2461,21 +2741,38 @@
             records.push(newRecord);
             await set(ref(database, `records/${currentUser.uid}`), records);
 
-            // Öğretmenlere bildirim gönder
+            // Öğretmenlere ve velilere bildirim gönder
             const studentRef = ref(database, `students/${currentUser.uid}`);
             const snapshot = await get(studentRef);
             const studentData = snapshot.val();
             
-            if (studentData && studentData.teachers && studentData.teachers.length > 0) {
-                for (const teacherId of studentData.teachers) {
-                    const notifRef = push(ref(database, `notifications/${teacherId}`));
-                    await set(notifRef, {
-                        studentId: currentUser.uid,
-                        studentName: currentUser.name,
-                        message: 'yeni çalışma kaydı ekledi',
-                        timestamp: Date.now(),
-                        read: false
-                    });
+            if (studentData) {
+                // Öğretmenlere bildirim
+                if (studentData.teachers && studentData.teachers.length > 0) {
+                    for (const teacherId of studentData.teachers) {
+                        const notifRef = push(ref(database, `notifications/${teacherId}`));
+                        await set(notifRef, {
+                            studentId: currentUser.uid,
+                            studentName: currentUser.name,
+                            message: 'yeni çalışma kaydı ekledi',
+                            timestamp: Date.now(),
+                            read: false
+                        });
+                    }
+                }
+                
+                // Velilere bildirim
+                if (studentData.parents && studentData.parents.length > 0) {
+                    for (const parentId of studentData.parents) {
+                        const notifRef = push(ref(database, `notifications/${parentId}`));
+                        await set(notifRef, {
+                            studentId: currentUser.uid,
+                            studentName: currentUser.name,
+                            message: 'yeni çalışma kaydı ekledi',
+                            timestamp: Date.now(),
+                            read: false
+                        });
+                    }
                 }
             }
 
@@ -2492,7 +2789,7 @@
             document.getElementById('calismaDakika').value = '';
             document.getElementById('notlar').value = '';
             
-            alert('✅ Kayıt başarıyla eklendi ve öğretmenlerinize bildirim gönderildi!');
+            alert('✅ Kayıt başarıyla eklendi!');
         };
 
         function displayCategories() {
@@ -2515,18 +2812,18 @@
             const container = document.getElementById('dynamicInputs');
             
             if (categories.length === 0) {
-                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 20px; grid-column: 1/-1;">Kategori ekledikten sonra buraya giriş alanları gelecek.</p>';
+                container.innerHTML = '<p style="color: #9ca3af; text-align: center; padding: 20px;">Kategori ekledikten sonra buraya giriş alanları gelecek.</p>';
                 return;
             }
 
             container.innerHTML = categories.map(category => `
-                <div class="input-group">
+                <div class="input-group compact">
                     <label>${category}</label>
-                    <div style="display: flex; gap: 10px; margin-bottom: 5px;">
+                    <div style="display: flex; gap: 5px; margin-bottom: 5px;">
                         <input type="number" id="input_dogru_${category}" placeholder="Doğru" min="0" style="flex: 1;">
                         <input type="number" id="input_yanlis_${category}" placeholder="Yanlış" min="0" style="flex: 1;">
                     </div>
-                    <textarea id="input_not_${category}" placeholder="Not..." rows="2"></textarea>
+                    <textarea id="input_not_${category}" placeholder="Not..." rows="1"></textarea>
                 </div>
             `).join('');
         }
@@ -2536,10 +2833,10 @@
             
             if (records.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 60px 20px; color: #9ca3af;">
-                        <p style="font-size: 3em;">📚</p>
+                    <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                        <p style="font-size: 2em;">📚</p>
                         <h3>Henüz kayıt yok</h3>
-                        <p>Yukarıdaki formu kullanarak ilk kaydını ekle!</p>
+                        <p>Soldaki formu kullanarak ilk kaydını ekle!</p>
                     </div>
                 `;
                 return;
@@ -2553,32 +2850,32 @@
                         <th>Tarih</th>
                         <th>Süre</th>
                         <th>Notlar</th>
-                        ${categories.map(cat => `<th>${cat}</th>`).join('')}
                         <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
-            sortedRecords.forEach(record => {
+            sortedRecords.slice(0, 10).forEach(record => {
                 const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
                 html += `
                     <tr>
                         <td><strong>${formattedDate}</strong></td>
                         <td>${record.calismaSuresi || '-'}</td>
-                        <td style="max-width: 200px;">${record.notlar || '-'}</td>
-                        ${categories.map(cat => {
-                            if (record.data && record.data[cat]) {
-                                const d = record.data[cat];
-                                return `<td><div style="font-size: 0.9em;">✅ ${d.dogru} ❌ ${d.yanlis}${d.not ? '<br><small style="color: #6b7280;">' + d.not + '</small>' : ''}</div></td>`;
-                            }
-                            return `<td>-</td>`;
-                        }).join('')}
-                        <td><button class="delete-btn" onclick="deleteRecord(${record.id})">🗑️</button></td>
+                        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${record.notlar || '-'}</td>
+                        <td>
+                            <button class="btn btn-small" onclick='showRecordDetails(${JSON.stringify(record).replace(/"/g, '&quot;')})' style="margin-right: 5px;">👁️</button>
+                            <button class="delete-btn btn-small" onclick="deleteRecord(${record.id})">🗑️</button>
+                        </td>
                     </tr>
                 `;
             });
 
             html += `</tbody></table></div>`;
+            
+            if (sortedRecords.length > 10) {
+                html += `<p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9em;">Son 10 kayıt gösteriliyor. Toplam ${sortedRecords.length} kayıt var.</p>`;
+            }
+            
             container.innerHTML = html;
         }
 
