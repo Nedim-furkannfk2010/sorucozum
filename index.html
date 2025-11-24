@@ -573,9 +573,9 @@
             background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
-            max-width: 800px; /* büyüttüm */
+            max-width: 800px;
             width: 90%;
-            max-height: 85vh; /* biraz daha yüksek */
+            max-height: 85vh;
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
@@ -889,6 +889,31 @@
             margin-top: 5px;
             font-size: 0.9em;
         }
+
+        /* Öğrenci sekmeleri */
+        .student-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .student-tab-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            background: rgba(255,255,255,0.8);
+            color: #374151;
+            transition: all 0.2s;
+        }
+        .student-tab-btn.active {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 4px 8px rgba(102,126,234,0.4);
+        }
     </style>
 </head>
 <body>
@@ -1104,72 +1129,82 @@
                 </div>
             </div>
 
-            <!-- Öğrenci - Ödevler -->
-            <div id="studentHomeworkSection" class="hidden">
-                <div class="card compact">
-                    <h2>📝 Ödevlerim</h2>
-                    <div id="studentHomeworkList"></div>
+            <!-- Öğrenci paneli -->
+            <div id="studentPanel" class="hidden">
+                <!-- Sekmeler -->
+                <div class="student-tabs">
+                    <button class="student-tab-btn active" id="tabKayitlarBtn" onclick="showStudentTab('kayitlar')">📊 Kayıtlar</button>
+                    <button class="student-tab-btn" id="tabOdevlerBtn" onclick="showStudentTab('odevler')">📝 Ödevler</button>
+                    <button class="student-tab-btn" id="tabMesajBtn" onclick="showStudentTab('mesaj')">💬 Mesajlaşma</button>
                 </div>
-            </div>
 
-            <!-- Öğrenci - Mesajlaşma -->
-            <div id="studentMessagesSection" class="hidden">
-                <div class="card compact">
-                    <h2>💬 Öğretmenlerimle Mesajlaşma</h2>
-                    <div id="studentTeacherSelect" style="margin-bottom: 20px;"></div>
-                    <div id="studentMessagesContainer"></div>
-                </div>
-            </div>
-
-            <!-- Öğrenci - Kategoriler ve Kayıt -->
-            <div id="studentSection" class="hidden">
-                <div class="compact-grid">
-                    <!-- Sol Kolon -->
-                    <div>
-                        <div class="card compact">
-                            <h2>🏷️ Kategorileri Yönet</h2>
-                            <div class="categories-section">
-                                <div class="category-input-group">
-                                    <input type="text" id="newCategory" placeholder="Kategori adı">
-                                    <button class="btn btn-small" onclick="addCategory()">➕ Ekle</button>
+                <!-- Kayıtlar Sekmesi -->
+                <div id="studentTabKayitlar">
+                    <div class="compact-grid">
+                        <!-- Sol Kolon -->
+                        <div>
+                            <div class="card compact">
+                                <h2>🏷️ Kategorileri Yönet</h2>
+                                <div class="categories-section">
+                                    <div class="category-input-group">
+                                        <input type="text" id="newCategory" placeholder="Kategori adı">
+                                        <button class="btn btn-small" onclick="addCategory()">➕ Ekle</button>
+                                    </div>
+                                    <div class="categories-list" id="categoriesList"></div>
                                 </div>
-                                <div class="categories-list" id="categoriesList"></div>
+                            </div>
+
+                            <div class="card compact">
+                                <h2>➕ Yeni Çalışma Kaydı</h2>
+                                <div class="input-group compact">
+                                    <label>📅 Tarih</label>
+                                    <input type="date" id="tarih">
+                                </div>
+                                <div class="input-group compact">
+                                    <label>⏱️ Çalışma Süresi</label>
+                                    <div style="display: flex; gap: 10px;">
+                                        <input type="number" id="calismaSaati" placeholder="Saat" min="0" style="flex: 1;">
+                                        <input type="number" id="calismaDakika" placeholder="Dakika" min="0" max="59" style="flex: 1;">
+                                    </div>
+                                </div>
+                                <div class="input-group compact">
+                                    <label>📝 Genel Notlar</label>
+                                    <textarea id="notlar" placeholder="Bugün neler yaptınız..." rows="2"></textarea>
+                                </div>
+                                <div id="dynamicInputs" style="margin-bottom: 15px;"></div>
+                                <button class="btn" onclick="addRecord()">💾 Kaydet</button>
                             </div>
                         </div>
 
-                        <div class="card compact">
-                            <h2>➕ Yeni Çalışma Kaydı</h2>
-                            <div class="input-group compact">
-                                <label>📅 Tarih</label>
-                                <input type="date" id="tarih">
-                            </div>
-                            <div class="input-group compact">
-                                <label>⏱️ Çalışma Süresi</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="number" id="calismaSaati" placeholder="Saat" min="0" style="flex: 1;">
-                                    <input type="number" id="calismaDakika" placeholder="Dakika" min="0" max="59" style="flex: 1;">
+                        <!-- Sağ Kolon -->
+                        <div>
+                            <div class="card compact">
+                                <h2>📊 Kayıtlarım</h2>
+                                <div style="margin-bottom: 10px; text-align:right;">
+                                    <button id="toggleWeekButton" class="btn btn-small btn-info" onclick="toggleWeekFilter()">
+                                        📅 Önceki Haftaları Göster
+                                    </button>
                                 </div>
+                                <div id="recordsContainer"></div>
                             </div>
-                            <div class="input-group compact">
-                                <label>📝 Genel Notlar</label>
-                                <textarea id="notlar" placeholder="Bugün neler yaptınız..." rows="2"></textarea>
-                            </div>
-                            <div id="dynamicInputs" style="margin-bottom: 15px;"></div>
-                            <button class="btn" onclick="addRecord()">💾 Kaydet</button>
                         </div>
                     </div>
+                </div>
 
-                    <!-- Sağ Kolon -->
-                    <div>
-                        <div class="card compact">
-                            <h2>📊 Kayıtlarım</h2>
-                            <div style="margin-bottom: 10px; text-align:right;">
-                                <button id="toggleWeekButton" class="btn btn-small btn-info" onclick="toggleWeekFilter()">
-                                    📅 Önceki Haftaları Göster
-                                </button>
-                            </div>
-                            <div id="recordsContainer"></div>
-                        </div>
+                <!-- Ödevler Sekmesi -->
+                <div id="studentTabOdevler" class="hidden">
+                    <div class="card compact">
+                        <h2>📝 Ödevlerim</h2>
+                        <div id="studentHomeworkList"></div>
+                    </div>
+                </div>
+
+                <!-- Mesajlaşma Sekmesi -->
+                <div id="studentTabMesaj" class="hidden">
+                    <div class="card compact">
+                        <h2>💬 Öğretmenlerimle Mesajlaşma</h2>
+                        <div id="studentTeacherSelect" style="margin-bottom: 20px;"></div>
+                        <div id="studentMessagesContainer"></div>
                     </div>
                 </div>
             </div>
@@ -1513,9 +1548,7 @@
             document.getElementById('teacherMessagesSection').classList.add('hidden');
             document.getElementById('teacherStudentList').classList.add('hidden');
             document.getElementById('teacherRecordsView').classList.add('hidden');
-            document.getElementById('studentHomeworkSection').classList.add('hidden');
-            document.getElementById('studentMessagesSection').classList.add('hidden');
-            document.getElementById('studentSection').classList.add('hidden');
+            document.getElementById('studentPanel').classList.add('hidden');
         }
 
         async function loadProfile() {
@@ -2295,9 +2328,7 @@
         async function showStudentInterface() {
             hideAllSections();
             document.getElementById('backButton').classList.add('hidden');
-            document.getElementById('studentSection').classList.remove('hidden');
-            document.getElementById('studentHomeworkSection').classList.remove('hidden');
-            document.getElementById('studentMessagesSection').classList.remove('hidden');
+            document.getElementById('studentPanel').classList.remove('hidden');
 
             const categoriesRef = ref(database, `categories/${currentUser.uid}`);
             onValue(categoriesRef, (snapshot) => {
@@ -2316,7 +2347,36 @@
             
             loadStudentHomeworks();
             loadStudentMessages();
+
+            // varsayılan olarak kayıtlar sekmesi
+            showStudentTab('kayitlar');
         }
+
+        // Öğrenci sekmelerini yönet
+        window.showStudentTab = function(tab) {
+            const kayitlarDiv = document.getElementById('studentTabKayitlar');
+            const odevlerDiv = document.getElementById('studentTabOdevler');
+            const mesajDiv = document.getElementById('studentTabMesaj');
+
+            kayitlarDiv.classList.add('hidden');
+            odevlerDiv.classList.add('hidden');
+            mesajDiv.classList.add('hidden');
+
+            document.getElementById('tabKayitlarBtn').classList.remove('active');
+            document.getElementById('tabOdevlerBtn').classList.remove('active');
+            document.getElementById('tabMesajBtn').classList.remove('active');
+
+            if (tab === 'kayitlar') {
+                kayitlarDiv.classList.remove('hidden');
+                document.getElementById('tabKayitlarBtn').classList.add('active');
+            } else if (tab === 'odevler') {
+                odevlerDiv.classList.remove('hidden');
+                document.getElementById('tabOdevlerBtn').classList.add('active');
+            } else if (tab === 'mesaj') {
+                mesajDiv.classList.remove('hidden');
+                document.getElementById('tabMesajBtn').classList.add('active');
+            }
+        };
 
         function displayStudentsList() {
             const container = document.getElementById('studentsGrid');
@@ -2464,7 +2524,6 @@
         };
 
         window.showRecordDetails = function(recordsForDay) {
-            // her zaman dizi bekliyoruz
             if (!Array.isArray(recordsForDay)) {
                 recordsForDay = [recordsForDay];
             }
@@ -2692,7 +2751,6 @@
                 return;
             }
 
-            // tarihe göre grupla
             const groupedByDate = {};
             records.forEach(rec => {
                 if (!groupedByDate[rec.tarih]) groupedByDate[rec.tarih] = [];
@@ -2701,7 +2759,6 @@
 
             let dates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
 
-            // sadece bu hafta gösterilecekse filtrele (hafta: pazartesi–pazar)
             if (showOnlyCurrentWeek) {
                 const today = new Date();
                 const dayOfWeek = today.getDay(); // 0=pazar,1=pazartesi
@@ -2743,7 +2800,6 @@
                 if (rowCount >= maxRows) break;
                 const dayRecords = groupedByDate[dt];
 
-                // toplam süre
                 let totalMinutes = 0;
                 dayRecords.forEach(r => {
                     if (r.calismaSuresi) {
