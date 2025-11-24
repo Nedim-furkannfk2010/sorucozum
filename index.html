@@ -573,9 +573,9 @@
             background: var(--card-bg);
             padding: 30px;
             border-radius: 20px;
-            max-width: 600px;
+            max-width: 800px; /* büyüttüm */
             width: 90%;
-            max-height: 80vh;
+            max-height: 85vh; /* biraz daha yüksek */
             overflow-y: auto;
             box-shadow: 0 10px 40px rgba(0,0,0,0.3);
         }
@@ -615,73 +615,6 @@
             border-radius: 15px;
             margin-bottom: 30px;
             text-align: center;
-        }
-
-        /* Calendar (GitHub Style) */
-        .calendar-container {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(53, 1fr);
-            gap: 3px;
-            margin-top: 20px;
-        }
-
-        .calendar-cell {
-            aspect-ratio: 1;
-            background: #eee;
-            border-radius: 3px;
-            position: relative;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        body.dark-mode .calendar-cell {
-            background: #2d3748;
-        }
-
-        .calendar-cell:hover {
-            transform: scale(1.2);
-            z-index: 10;
-        }
-
-        .calendar-cell.level-0 { background: #ebedf0; }
-        .calendar-cell.level-1 { background: #9be9a8; }
-        .calendar-cell.level-2 { background: #40c463; }
-        .calendar-cell.level-3 { background: #30a14e; }
-        .calendar-cell.level-4 { background: #216e39; }
-
-        body.dark-mode .calendar-cell.level-0 { background: #161b22; }
-        body.dark-mode .calendar-cell.level-1 { background: #0e4429; }
-        body.dark-mode .calendar-cell.level-2 { background: #006d32; }
-        body.dark-mode .calendar-cell.level-3 { background: #26a641; }
-        body.dark-mode .calendar-cell.level-4 { background: #39d353; }
-
-        .calendar-legend {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: var(--text-secondary);
-        }
-
-        .legend-item {
-            width: 12px;
-            height: 12px;
-            border-radius: 2px;
         }
 
         /* Messages */
@@ -911,7 +844,6 @@
             transform: translateX(-5px);
         }
 
-        /* Compact grid layout for student */
         .compact-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -933,10 +865,29 @@
             .action-buttons {
                 flex-direction: column;
             }
+        }
 
-            .calendar-grid {
-                grid-template-columns: repeat(26, 1fr);
-            }
+        /* Kayıt detay modal içeriği */
+        .record-detail-item {
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            background: #f9fafb;
+        }
+        body.dark-mode .record-detail-item {
+            background: #0f1419;
+        }
+        .record-detail-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+        .record-detail-categories {
+            margin-top: 5px;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -1153,24 +1104,6 @@
                 </div>
             </div>
 
-            <!-- Öğrenci - Takvim -->
-            <div id="studentCalendar" class="hidden">
-                <div class="card calendar-container compact">
-                    <h2>📅 Çalışma Takvimi</h2>
-                    <p style="color: var(--text-secondary); margin-bottom: 10px;">Son 365 günlük çalışma aktiviteniz</p>
-                    <div class="calendar-grid" id="calendarGrid"></div>
-                    <div class="calendar-legend">
-                        <span style="margin-right: 10px;">Az</span>
-                        <div class="legend-item level-0"></div>
-                        <div class="legend-item level-1"></div>
-                        <div class="legend-item level-2"></div>
-                        <div class="legend-item level-3"></div>
-                        <div class="legend-item level-4"></div>
-                        <span style="margin-left: 10px;">Çok</span>
-                    </div>
-                </div>
-            </div>
-
             <!-- Öğrenci - Ödevler -->
             <div id="studentHomeworkSection" class="hidden">
                 <div class="card compact">
@@ -1230,6 +1163,11 @@
                     <div>
                         <div class="card compact">
                             <h2>📊 Kayıtlarım</h2>
+                            <div style="margin-bottom: 10px; text-align:right;">
+                                <button id="toggleWeekButton" class="btn btn-small btn-info" onclick="toggleWeekFilter()">
+                                    📅 Önceki Haftaları Göster
+                                </button>
+                            </div>
                             <div id="recordsContainer"></div>
                         </div>
                     </div>
@@ -1299,11 +1237,21 @@
             <div class="input-group">
                 <label>👥 Öğrenci Seç</label>
                 <select id="homeworkStudentSelect" multiple style="min-height: 150px;">
-                    <!-- Öğrenciler buraya gelecek -->
                 </select>
                 <small style="color: var(--text-secondary);">Ctrl/Cmd tuşu ile birden fazla seçebilirsiniz</small>
             </div>
             <button class="btn" onclick="saveHomework()">📤 Ödev Oluştur</button>
+        </div>
+    </div>
+
+    <!-- Kayıt Detay Modalı -->
+    <div id="recordDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="recordDetailTitle">Kayıt Detayları</h3>
+                <button class="close-modal" onclick="closeRecordDetailModal()">✕</button>
+            </div>
+            <div id="recordDetailBody"></div>
         </div>
     </div>
 
@@ -1336,6 +1284,8 @@
         let messages = {};
         let editingUserId = null;
         let selectedMessageRecipient = null;
+
+        let showOnlyCurrentWeek = true;
 
         const ADMIN_EMAIL = 'admin@gmail.com';
         const ADMIN_PASSWORD = 'admin123';
@@ -1532,7 +1482,6 @@
             }
         }
 
-        // ========== GERİ DÖN BUTONU ==========
         window.backToMain = function() {
             hideAllSections();
             document.getElementById('backButton').classList.add('hidden');
@@ -1548,7 +1497,6 @@
             }
         };
 
-        // ========== PROFIL ==========
         window.showProfile = function() {
             hideAllSections();
             document.getElementById('backButton').classList.remove('hidden');
@@ -1565,7 +1513,6 @@
             document.getElementById('teacherMessagesSection').classList.add('hidden');
             document.getElementById('teacherStudentList').classList.add('hidden');
             document.getElementById('teacherRecordsView').classList.add('hidden');
-            document.getElementById('studentCalendar').classList.add('hidden');
             document.getElementById('studentHomeworkSection').classList.add('hidden');
             document.getElementById('studentMessagesSection').classList.add('hidden');
             document.getElementById('studentSection').classList.add('hidden');
@@ -1577,7 +1524,6 @@
             document.getElementById('profileEmailEdit').value = currentUser.email;
             document.getElementById('profileBio').value = currentUser.bio || '';
 
-            // Avatar
             const avatarContainer = document.getElementById('profileAvatarContainer');
             if (currentUser.avatar) {
                 avatarContainer.innerHTML = `<img src="${currentUser.avatar}" class="profile-avatar" onclick="document.getElementById('avatarUpload').click()">`;
@@ -1586,7 +1532,6 @@
                 avatarContainer.innerHTML = `<div class="profile-avatar-placeholder" onclick="document.getElementById('avatarUpload').click()">${initial}</div>`;
             }
 
-            // İstatistikler
             if (currentUser.userType === 'student') {
                 const recordsRef = ref(database, `records/${currentUser.uid}`);
                 const snapshot = await get(recordsRef);
@@ -1680,7 +1625,6 @@
             alert('✅ Şifre değiştirildi!');
         };
 
-        // ========== ADMIN PANEL ==========
         function showAdminPanel() {
             document.getElementById('userDisplayName').innerHTML = 
                 `${currentUser.name} <span class="badge badge-admin">👑 Admin</span>`;
@@ -1875,7 +1819,6 @@
             }
         };
 
-        // ========== VELİ PANELİ ==========
         async function showParentInterface() {
             document.getElementById('userDisplayName').innerHTML = 
                 `${currentUser.name} <span class="badge badge-parent">👨‍👩‍👧 Veli</span>`;
@@ -1884,16 +1827,13 @@
             document.getElementById('backButton').classList.add('hidden');
             document.getElementById('parentPanel').classList.remove('hidden');
 
-            // Soyadı çıkar
             const lastName = currentUser.name.split(' ').pop();
 
-            // Tüm öğrencileri yükle
             const studentsRef = ref(database, 'students');
             onValue(studentsRef, async (snapshot) => {
                 const students = [];
                 snapshot.forEach((child) => {
                     const studentData = { id: child.key, ...child.val() };
-                    // Soyad eşleşmesi kontrolü
                     const studentLastName = studentData.name.split(' ').pop();
                     if (studentLastName.toLowerCase() === lastName.toLowerCase()) {
                         students.push(studentData);
@@ -1903,7 +1843,6 @@
                 displayParentStudents();
             });
 
-            // Veli bildirimleri
             const notificationsRef = ref(database, `notifications/${currentUser.uid}`);
             onValue(notificationsRef, (snapshot) => {
                 const notifs = [];
@@ -2034,7 +1973,7 @@
                     
                     studentRecords.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)).slice(0, 5).forEach(record => {
                         const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
-                        const detailsStr = JSON.stringify(record).replace(/"/g, '&quot;');
+                        const detailsStr = JSON.stringify([record]).replace(/"/g, '&quot;');
                         html += `
                             <tr>
                                 <td><strong>${formattedDate}</strong></td>
@@ -2055,7 +1994,6 @@
             container.innerHTML = html;
         }
 
-        // ========== ÖĞRETMEN PANELİ ==========
         async function showTeacherInterface() {
             hideAllSections();
             document.getElementById('backButton').classList.add('hidden');
@@ -2088,115 +2026,6 @@
                 displayNotifications();
             });
         }
-
-        // ========== TAKVIM (GITHUB STYLE) ==========
-        function generateCalendar() {
-            const container = document.getElementById('calendarGrid');
-            const today = new Date();
-            const cells = [];
-            
-            for (let i = 364; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i);
-                const dateStr = date.toISOString().split('T')[0];
-                
-                const dayRecords = records.filter(r => r.tarih === dateStr);
-                let level = 0;
-                
-                if (dayRecords.length > 0) {
-                    let totalMinutes = 0;
-                    dayRecords.forEach(record => {
-                        if (record.calismaSuresi) {
-                            const match = record.calismaSuresi.match(/(\d+)\s*saat|(\d+)\s*dk/g);
-                            if (match) {
-                                match.forEach(part => {
-                                    if (part.includes('saat')) {
-                                        totalMinutes += parseInt(part) * 60;
-                                    } else if (part.includes('dk')) {
-                                        totalMinutes += parseInt(part);
-                                    }
-                                });
-                            }
-                        }
-                    });
-                    
-                    if (totalMinutes > 0) level = 1;
-                    if (totalMinutes >= 60) level = 2;
-                    if (totalMinutes >= 120) level = 3;
-                    if (totalMinutes >= 180) level = 4;
-                }
-                
-                const title = `${dateStr}: ${dayRecords.length} kayıt`;
-                cells.push(`<div class="calendar-cell level-${level}" title="${title}"></div>`);
-            }
-            
-            container.innerHTML = cells.join('');
-        }
-
-        // ========== ÖDEV SİSTEMİ ==========
-        window.openHomeworkModal = function() {
-            document.getElementById('homeworkModalTitle').textContent = '➕ Ödev Oluştur';
-            document.getElementById('homeworkTitle').value = '';
-            document.getElementById('homeworkDescription').value = '';
-            document.getElementById('homeworkDueDate').value = '';
-            
-            const select = document.getElementById('homeworkStudentSelect');
-            const trackingStudents = allStudents.filter(s => 
-                s.teachers && s.teachers.includes(currentUser.uid)
-            );
-            
-            select.innerHTML = trackingStudents.map(student => 
-                `<option value="${student.id}">${student.name}</option>`
-            ).join('');
-            
-            document.getElementById('homeworkModal').classList.add('active');
-        };
-
-        window.closeHomeworkModal = function() {
-            document.getElementById('homeworkModal').classList.remove('active');
-        };
-
-        window.saveHomework = async function() {
-            const title = document.getElementById('homeworkTitle').value.trim();
-            const description = document.getElementById('homeworkDescription').value.trim();
-            const dueDate = document.getElementById('homeworkDueDate').value;
-            const select = document.getElementById('homeworkStudentSelect');
-            const selectedStudents = Array.from(select.selectedOptions).map(opt => opt.value);
-
-            if (!title || !description || !dueDate || selectedStudents.length === 0) {
-                alert('Lütfen tüm alanları doldurun ve en az bir öğrenci seçin!');
-                return;
-            }
-
-            try {
-                for (const studentId of selectedStudents) {
-                    const homeworkId = 'hw_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-                    await set(ref(database, `homeworks/${homeworkId}`), {
-                        title: title,
-                        description: description,
-                        dueDate: dueDate,
-                        teacherId: currentUser.uid,
-                        teacherName: currentUser.name,
-                        studentId: studentId,
-                        status: 'pending',
-                        createdAt: new Date().toISOString()
-                    });
-
-                    const notifRef = push(ref(database, `notifications/${studentId}`));
-                    await set(notifRef, {
-                        type: 'homework',
-                        message: `${currentUser.name} size yeni ödev verdi: ${title}`,
-                        timestamp: Date.now(),
-                        read: false
-                    });
-                }
-
-                alert('✅ Ödev başarıyla oluşturuldu!');
-                closeHomeworkModal();
-            } catch (error) {
-                alert('Hata: ' + error.message);
-            }
-        };
 
         async function loadTeacherHomeworks() {
             const homeworkRef = ref(database, 'homeworks');
@@ -2316,7 +2145,6 @@
             }
         };
 
-        // ========== MESAJLAŞMA ==========
         async function loadTeacherMessages() {
             const container = document.getElementById('teacherStudentSelect');
             const trackingStudents = allStudents.filter(s => 
@@ -2464,12 +2292,10 @@
             }
         };
 
-        // ========== ÖĞRENCİ PANELİ ==========
         async function showStudentInterface() {
             hideAllSections();
             document.getElementById('backButton').classList.add('hidden');
             document.getElementById('studentSection').classList.remove('hidden');
-            document.getElementById('studentCalendar').classList.remove('hidden');
             document.getElementById('studentHomeworkSection').classList.remove('hidden');
             document.getElementById('studentMessagesSection').classList.remove('hidden');
 
@@ -2484,7 +2310,6 @@
             onValue(recordsRef, (snapshot) => {
                 records = snapshot.val() || [];
                 displayRecords();
-                generateCalendar();
             });
 
             document.getElementById('tarih').value = new Date().toISOString().split('T')[0];
@@ -2612,7 +2437,7 @@
                     
                     studentRecords.sort((a, b) => new Date(b.tarih) - new Date(a.tarih)).slice(0, 5).forEach(record => {
                         const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
-                        const detailsStr = JSON.stringify(record).replace(/"/g, '&quot;');
+                        const detailsStr = JSON.stringify([record]).replace(/"/g, '&quot;');
                         html += `
                             <tr>
                                 <td><strong>${formattedDate}</strong></td>
@@ -2632,25 +2457,53 @@
             container.innerHTML = html;
         }
 
-        window.showRecordDetails = function(record) {
-            let details = `📅 Tarih: ${new Date(record.tarih).toLocaleDateString('tr-TR')}\n`;
-            details += `⏱️ Süre: ${record.calismaSuresi || 'Belirtilmemiş'}\n`;
-            details += `📝 Notlar: ${record.notlar || 'Yok'}\n\n`;
-            details += '━━━━━━━━━━━━━━━━━━━━\n';
-            details += '📊 Kategori Detayları:\n\n';
-            
-            for (const [category, data] of Object.entries(record.data || {})) {
-                details += `📌 ${category}:\n`;
-                details += `   ✅ Doğru: ${data.dogru}\n`;
-                details += `   ❌ Yanlış: ${data.yanlis}\n`;
-                if (data.not) details += `   📝 Not: ${data.not}\n`;
-                details += '\n';
-            }
-            
-            alert(details);
+        // Kayıt Detay Modalını Aç/Kapat
+        window.closeRecordDetailModal = function() {
+            document.getElementById('recordDetailModal').classList.remove('active');
+            document.getElementById('recordDetailBody').innerHTML = '';
         };
 
-        // ========== ÖĞRENCİ FONKSİYONLARI ==========
+        window.showRecordDetails = function(recordsForDay) {
+            // her zaman dizi bekliyoruz
+            if (!Array.isArray(recordsForDay)) {
+                recordsForDay = [recordsForDay];
+            }
+            if (recordsForDay.length === 0) return;
+
+            const dateStr = new Date(recordsForDay[0].tarih).toLocaleDateString('tr-TR');
+            document.getElementById('recordDetailTitle').textContent = `📅 ${dateStr} - Kayıt Detayları`;
+
+            let html = '';
+            recordsForDay.forEach((record, index) => {
+                html += `<div class="record-detail-item">
+                    <div class="record-detail-header">
+                        <span>Kayıt #${index + 1}</span>
+                        <span>${record.calismaSuresi || 'Süre belirtilmemiş'}</span>
+                    </div>
+                    <div><strong>Notlar:</strong> ${record.notlar && record.notlar.trim() ? record.notlar : 'Yok'}</div>
+                    <div class="record-detail-categories">
+                        <strong>Kategori Detayları:</strong><br>`;
+                if (!record.data || Object.keys(record.data).length === 0) {
+                    html += `<span style="color: var(--text-secondary);">Kategori bilgisi yok.</span>`;
+                } else {
+                    for (const [category, data] of Object.entries(record.data || {})) {
+                        html += `
+                            <div style="margin-top:4px;">
+                                📌 <strong>${category}</strong><br>
+                                &nbsp;&nbsp;✅ Doğru: ${data.dogru}<br>
+                                &nbsp;&nbsp;❌ Yanlış: ${data.yanlis}<br>
+                                ${data.not ? `&nbsp;&nbsp;📝 Not: ${data.not}<br>` : ''}
+                            </div>
+                        `;
+                    }
+                }
+                html += `</div></div>`;
+            });
+
+            document.getElementById('recordDetailBody').innerHTML = html;
+            document.getElementById('recordDetailModal').classList.add('active');
+        };
+
         window.addCategory = async function() {
             const input = document.getElementById('newCategory');
             const categoryName = input.value.trim();
@@ -2741,13 +2594,11 @@
             records.push(newRecord);
             await set(ref(database, `records/${currentUser.uid}`), records);
 
-            // Öğretmenlere ve velilere bildirim gönder
             const studentRef = ref(database, `students/${currentUser.uid}`);
             const snapshot = await get(studentRef);
             const studentData = snapshot.val();
             
             if (studentData) {
-                // Öğretmenlere bildirim
                 if (studentData.teachers && studentData.teachers.length > 0) {
                     for (const teacherId of studentData.teachers) {
                         const notifRef = push(ref(database, `notifications/${teacherId}`));
@@ -2761,7 +2612,6 @@
                     }
                 }
                 
-                // Velilere bildirim
                 if (studentData.parents && studentData.parents.length > 0) {
                     for (const parentId of studentData.parents) {
                         const notifRef = push(ref(database, `notifications/${parentId}`));
@@ -2776,7 +2626,6 @@
                 }
             }
 
-            // Formu temizle
             categories.forEach(category => {
                 const dogruInput = document.getElementById('input_dogru_' + category);
                 const yanlisInput = document.getElementById('input_yanlis_' + category);
@@ -2828,10 +2677,11 @@
             `).join('');
         }
 
+        // Haftalık filtre + gün başına tek satır
         function displayRecords() {
             const container = document.getElementById('recordsContainer');
             
-            if (records.length === 0) {
+            if (!records || records.length === 0) {
                 container.innerHTML = `
                     <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
                         <p style="font-size: 2em;">📚</p>
@@ -2842,42 +2692,120 @@
                 return;
             }
 
-            const sortedRecords = [...records].sort((a, b) => new Date(b.tarih) - new Date(a.tarih));
+            // tarihe göre grupla
+            const groupedByDate = {};
+            records.forEach(rec => {
+                if (!groupedByDate[rec.tarih]) groupedByDate[rec.tarih] = [];
+                groupedByDate[rec.tarih].push(rec);
+            });
+
+            let dates = Object.keys(groupedByDate).sort((a, b) => new Date(b) - new Date(a));
+
+            // sadece bu hafta gösterilecekse filtrele (hafta: pazartesi–pazar)
+            if (showOnlyCurrentWeek) {
+                const today = new Date();
+                const dayOfWeek = today.getDay(); // 0=pazar,1=pazartesi
+                const monday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - ((dayOfWeek + 6) % 7));
+                const sunday = new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + 6);
+
+                dates = dates.filter(d => {
+                    const [y, m, day] = d.split('-').map(Number);
+                    const dt = new Date(y, m - 1, day);
+                    return dt >= monday && dt <= sunday;
+                });
+            }
+
+            if (dates.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px 20px; color: #9ca3af;">
+                        <h3>Bu kriterlere uygun kayıt yok</h3>
+                        <p>${showOnlyCurrentWeek ? 'Bu hafta için kayıt bulunamadı.' : ''}</p>
+                    </div>
+                `;
+                return;
+            }
 
             let html = `<div class="records-table"><table>
                 <thead>
                     <tr>
                         <th>Tarih</th>
-                        <th>Süre</th>
+                        <th>Toplam Süre</th>
                         <th>Notlar</th>
                         <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody>`;
 
-            sortedRecords.slice(0, 10).forEach(record => {
-                const formattedDate = new Date(record.tarih).toLocaleDateString('tr-TR');
+            const maxRows = 10;
+            let rowCount = 0;
+
+            for (const dt of dates) {
+                if (rowCount >= maxRows) break;
+                const dayRecords = groupedByDate[dt];
+
+                // toplam süre
+                let totalMinutes = 0;
+                dayRecords.forEach(r => {
+                    if (r.calismaSuresi) {
+                        const match = r.calismaSuresi.match(/(\d+)\s*saat|(\d+)\s*dk/g);
+                        if (match) {
+                            match.forEach(part => {
+                                if (part.includes('saat')) totalMinutes += parseInt(part) * 60;
+                                else if (part.includes('dk')) totalMinutes += parseInt(part);
+                            });
+                        }
+                    }
+                });
+
+                let totalDurationStr = '-';
+                if (totalMinutes > 0) {
+                    const h = Math.floor(totalMinutes / 60);
+                    const m = totalMinutes % 60;
+                    if (h > 0 && m > 0) totalDurationStr = `${h} saat ${m} dk`;
+                    else if (h > 0) totalDurationStr = `${h} saat`;
+                    else totalDurationStr = `${m} dk`;
+                }
+
+                const notes = dayRecords
+                    .map(r => r.notlar && r.notlar.trim())
+                    .filter(Boolean);
+                const notesStr = notes.length > 0 ? notes.join(' | ') : '-';
+
+                const formattedDate = new Date(dt).toLocaleDateString('tr-TR');
+
                 html += `
                     <tr>
                         <td><strong>${formattedDate}</strong></td>
-                        <td>${record.calismaSuresi || '-'}</td>
-                        <td style="max-width: 150px; overflow: hidden; text-overflow: ellipsis;">${record.notlar || '-'}</td>
+                        <td>${totalDurationStr}</td>
+                        <td style="max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notesStr}</td>
                         <td>
-                            <button class="btn btn-small" onclick='showRecordDetails(${JSON.stringify(record).replace(/"/g, '&quot;')})' style="margin-right: 5px;">👁️</button>
-                            <button class="delete-btn btn-small" onclick="deleteRecord(${record.id})">🗑️</button>
+                            <button class="btn btn-small" onclick='showRecordDetails(${JSON.stringify(dayRecords).replace(/"/g,"&quot;")})' style="margin-right: 5px;">👁️</button>
+                            <button class="delete-btn btn-small" onclick="deleteRecord(${dayRecords[0].id})">🗑️</button>
                         </td>
                     </tr>
                 `;
-            });
+                rowCount++;
+            }
 
             html += `</tbody></table></div>`;
-            
-            if (sortedRecords.length > 10) {
-                html += `<p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9em;">Son 10 kayıt gösteriliyor. Toplam ${sortedRecords.length} kayıt var.</p>`;
+
+            const totalDays = Object.keys(groupedByDate).length;
+            if (totalDays > maxRows && !showOnlyCurrentWeek) {
+                html += `<p style="text-align: center; color: var(--text-secondary); margin-top: 15px; font-size: 0.9em;">Son ${maxRows} gün gösteriliyor. Toplam ${totalDays} farklı gün kaydı var.</p>`;
             }
             
             container.innerHTML = html;
+
+            const btn = document.getElementById('toggleWeekButton');
+            if (btn) {
+                btn.textContent = showOnlyCurrentWeek ? '📅 Önceki Haftaları Göster' : '📅 Sadece Bu Haftayı Göster';
+            }
         }
+
+        window.toggleWeekFilter = function() {
+            showOnlyCurrentWeek = !showOnlyCurrentWeek;
+            displayRecords();
+        };
 
         window.deleteRecord = async function(id) {
             if (confirm('Bu kaydı silmek istediğinize emin misiniz?')) {
