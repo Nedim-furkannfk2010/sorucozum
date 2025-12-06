@@ -1,0 +1,35 @@
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Arka plan -->
+  <rect width="32" height="32" rx="6" fill="url(#bgGrad)"/>
+  
+  <!-- Saat dairesi -->
+  <circle cx="16" cy="16" r="10" fill="white"/>
+  
+  <!-- Saat göstergeleri -->
+  <circle cx="16" cy="9" r="1" fill="#667eea"/>
+  <circle cx="23" cy="16" r="1" fill="#667eea"/>
+  <circle cx="16" cy="23" r="1" fill="#667eea"/>
+  <circle cx="9" cy="16" r="1" fill="#667eea"/>
+  
+  <!-- Saat merkezi -->
+  <circle cx="16" cy="16" r="1.5" fill="#667eea"/>
+  
+  <!-- Akrep -->
+  <line x1="16" y1="16" x2="16" y2="12" stroke="#667eea" stroke-width="1.5" stroke-linecap="round"/>
+  
+  <!-- Yelkovan -->
+  <line x1="16" y1="16" x2="20" y2="16" stroke="#764ba2" stroke-width="1.2" stroke-linecap="round"/>
+  
+  <!-- Onay işareti -->
+  <g transform="translate(22, 22)">
+    <circle r="6" fill="#48bb78"/>
+    <path d="M -2 0 L -0.5 1.5 L 2 -1.5" fill="none" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
